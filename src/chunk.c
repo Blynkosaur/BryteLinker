@@ -13,7 +13,22 @@ void initChunk(Chunk* chunk){
 }
 
 void * grow_array(size_t size_of_type, void * pointer, int oldCount, int newCount){
-    //FILL THIS SHIT OUT TOMORROW
+    //to use: pointer = grow_array smt machin chouette grosse merde
+    if (newCount == 0){
+        free(pointer);
+        return NULL;
+    }
+    pointer = realloc(pointer, (newCount*size_of_type));
+    if(pointer == NULL){
+        exit(1);
+    }
+    return pointer;
+
+}
+void freeChunk(Chunk*chunk){
+    free(chunk->code);
+    initChunk(chunk);
+    
 }
 
 void writeChunk(Chunk* chunk, u_int8_t byte){
@@ -21,8 +36,8 @@ void writeChunk(Chunk* chunk, u_int8_t byte){
     if (chunk->capacity < chunk->count +1){
         int oldCapacity = chunk->capacity;
         chunk -> capacity = GROW_CAPACITY(oldCapacity);
-        chunk-> code = growArray(sizeof(u_int8_t), chunk->code, oldCapacity, chunk->capacity);
-
+        chunk-> code = grow_array(sizeof(u_int8_t), chunk->code, oldCapacity, chunk->capacity);
+        // chunk->code is a pointer to an array of int
     }
     chunk->code[chunk->count] = byte;
     chunk->count ++;
