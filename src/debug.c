@@ -17,6 +17,9 @@ int disassembleInstruction (Chunk*chunk, int offset){
     switch(instruction){
         case OP_RETURN:
             return simpleInstruction("OP_RETURN", offset);
+
+        case OP_CONSTANT:
+        return constantInstruction("OP_CONSTANT", chunk, offset);
         default:
             printf("Unknowd opcode %d\n", instruction);
             return offset+1;
@@ -25,4 +28,8 @@ int disassembleInstruction (Chunk*chunk, int offset){
 static int simpleInstruction(const char* name, int offset){
     printf("%s\n", name);
     return offset +1;
+}
+
+static int constantInstruction (const char* name, Chunk* chunk, int offset){
+    
 }

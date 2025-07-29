@@ -6,9 +6,11 @@
 
 
 
+
 void initChunk(Chunk* chunk){
     chunk->count = 0;
     chunk -> capacity = 0;
+    initValueArray(&chunk->constants);
     chunk ->code = NULL;
 }
 
@@ -27,8 +29,14 @@ void * grow_array(size_t size_of_type, void * pointer, int oldCount, int newCoun
 }
 void freeChunk(Chunk*chunk){
     free(chunk->code);
+    free(&chunk->constants);
     initChunk(chunk);
     
+}
+
+int addConstant(Chunk* chunk, Value value){
+    writeValueArray(&chunk->constants, value);
+    return chunk->constants.count -1; // the index in the constant array
 }
 
 void writeChunk(Chunk* chunk, u_int8_t byte){
