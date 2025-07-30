@@ -31,5 +31,5 @@ static int simpleInstruction(const char* name, int offset){
 }
 
 static int constantInstruction (const char* name, Chunk* chunk, int offset){
-    
+    int i = 1;
 }
