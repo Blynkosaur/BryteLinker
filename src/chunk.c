@@ -30,7 +30,7 @@ void * grow_array(size_t size_of_type, void * pointer, int oldCount, int newCoun
 }
 void freeChunk(Chunk*chunk){
     free(chunk->code);
-    free(&chunk->constants);
+    free(chunk->constants.values);
     free(chunk->lines);
     initChunk(chunk);
     
