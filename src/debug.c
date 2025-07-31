@@ -31,5 +31,9 @@ static int simpleInstruction(const char* name, int offset){
 }
 
 static int constantInstruction (const char* name, Chunk* chunk, int offset){
-    int i = 2;
+    u_int8_t constant = chunk->code[offset+1]; // constant is the index of the constant we want ig
+    printf("%-16s %4d",name, constant);// returns the 
+    printValue(chunk->constants.values[constant]);
+    printf("\n");
+
 }
