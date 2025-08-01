@@ -16,6 +16,6 @@ void initValueArray(ValueArray*);
 void writeValueArray(ValueArray*, Value);
 void freeValueArray(ValueArray*);
 
-void printValue(Value value)
+void printValue(Value value);
 
 #endif
