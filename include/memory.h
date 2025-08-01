@@ -1,4 +1,4 @@
-#if !defined bryte_memory_h
+#ifndef bryte_memory_h
 #include <stdlib.h>
 #define bryte_memory_h
 
