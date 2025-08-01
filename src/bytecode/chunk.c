@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include "../include/chunk.h"
+#include "bytecode/chunk.h"
 #include "../include/memory.h"
 
 

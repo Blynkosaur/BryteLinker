@@ -1,5 +1,5 @@
-#include "../include/value.h"
-#include "../include/memory.h"
+#include "bytecode/value.h"
+#include "memory.h"
 
 
 #include <stdio.h>

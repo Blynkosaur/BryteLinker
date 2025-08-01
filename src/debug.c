@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../include/debug.h"
+#include "debug.h"
 
 
 static int simpleInstruction(const char*, int);
