@@ -1,7 +1,7 @@
 #ifndef bryte_chunk_h
 
 #define bryte_chunk_h
-#include "common.h"
+#include "../common.h"
 #include "value.h"
 
 typedef enum {

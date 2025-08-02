@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include "bytecode/chunk.h"
-#include "../include/memory.h"
+#include "../../include/bytecode/chunk.h"
+#include "../../include/memory.h"
 
 
 

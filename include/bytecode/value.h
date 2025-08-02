@@ -1,7 +1,7 @@
 #ifndef bryte_value_h
 
 #define bryte_value_h
-#include "common.h"
+#include "../common.h"
 
 typedef double Value;
 

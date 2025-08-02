@@ -1,8 +1,9 @@
-#include "common.h"
-#include "chunk.h"
-#include "debug.h"
-#include "vm"
+#include "../include/common.h"
+#include "../include/bytecode/chunk.h"
+#include "../include/debug.h"
+
 int main(int argc, const char* argv[]){
+    
     Chunk chunk;
     initChunk(&chunk);
     int constant = addConstant(&chunk, 1.2);// adds constant to the constant array

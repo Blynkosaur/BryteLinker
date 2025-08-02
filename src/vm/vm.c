@@ -1,2 +1,12 @@
 #include "common.h"
-#include
+#include "vm/vm.h"
+
+VM vm;
+
+void initVM(){
+
+}
+
+void freeVM(){
+
+}
