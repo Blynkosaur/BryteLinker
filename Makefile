@@ -5,13 +5,13 @@ OTHER_FLAGS = -v -g -Wall
 
 LINK_TARGET = build/main
 
-SRC_FILES = main.c debug.c chunk.c value.c
+SRC_FILES = main.c debug.c chunk.c value.c vm.c
 
 TARGET_OBJS = $(SRC_FILES:%.c=build/%.o)
 
-vpath %.c src src/bytecode
+vpath %.c src src/bytecode src/vm
 
-vpath %.h include include/bytecode
+vpath %.h include include/bytecode include/vm
 
 build:
 	mkdir -p build
@@ -35,7 +35,8 @@ clean:
 	rm -rf build/*
 	echo cleaning done
 
-main.c: common.h chunk.h debug.h
+main.c: common.h chunk.h debug.h vm.h
 debug.c: debug.h
 chunk.c: chunk.h memory.h
 value.c: value.h memory.h
+vm.c: common.h vm.h
