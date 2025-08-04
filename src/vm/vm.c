@@ -11,19 +11,29 @@ static InterpretResult run(){
     #define READ_BYTE() (*vm.ip++)// dereferences vm.ip and moves the pointer more
     #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
     for (;;){
-        #ifdef DEBUG_TRACE_EXECUTION
+        #ifdef DEBUG_TRACE_EXECUTION // only for debugging
         disassembleInstruction(vm.chunk, (int)(vm.ip-vm.chunk->code));
+        printf("          ");
+        for(Value*slot = vm.stack; slot<vm.stackTop; slot++){
+            printf("[ ");
+            printValue(*slot);
+            printf(" ]");
+        }
+        print('\n');
         #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()){
             case OP_CONSTANT:{
                 Value constant = READ_CONSTANT();
                 printValue (constant);
+                push(constant);
                 printf("\n");
                 break;
 
             }
             case OP_RETURN:{
+                printValue(pop());
+                pringf("\n");
                 return INTERPRET_OK;
             }
 
@@ -39,9 +49,31 @@ InterpretResult interpret(Chunk*chunk){
 
 }
 void initVM(){
+    resetStack();
 
 }
+static void resetStack(){
+    vm.stackTop = vm.stack;
+}
+void push(Value value){
+    *(vm.stackTop) = value;
+    vm.stackTop++;
 
+}
+Value pop(){
+    vm.stackTop--;//never explicitly removes the last element
+    Value value = *(vm.stackTop);
+    return value;
+
+
+}
 void freeVM(){
 
 }
+// typedef struct{
+//     Chunk*chunk;
+//     uint8_t* ip;
+//     Value stack[STACK_MAX];
+//     Value *stackTop;
+
+// }VM;
