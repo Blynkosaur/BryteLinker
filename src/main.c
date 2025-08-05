@@ -15,6 +15,17 @@ int main(int argc, const char* argv[]){
     CST_ARRAY = {1.2} --> THE 1.2 IS AT INDEX 0 SO THE OPERATION CAN KNOW WHAT INDEX
     TO ACCESS NEXT
     */
+   constant = addConstant(&chunk,3.4);
+   writeChunk(&chunk, OP_CONSTANT, 123);
+   writeChunk(&chunk, constant, 123);
+
+   writeChunk(&chunk, OP_ADD, 123);
+   constant = addConstant(&chunk,5.6);
+   writeChunk(&chunk, OP_CONSTANT,123);
+   writeChunk(&chunk, constant, 123);
+
+   writeChunk(&chunk, OP_DIVIDE, 123);
+   
    writeChunk(&chunk, OP_NEGATE, 123);
     writeChunk(&chunk, OP_RETURN,123);
     disassembleChunk(&chunk, "test chunk");
