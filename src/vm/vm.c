@@ -33,7 +33,7 @@ static InterpretResult run(){
             }
             case OP_RETURN:{
                 printValue(pop());
-                pringf("\n");
+                pringf("\n");s
                 return INTERPRET_OK;
             }
 
