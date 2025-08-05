@@ -6,7 +6,7 @@
 
 VM vm;
 
-
+k
 static InterpretResult run(){
     #define READ_BYTE() (*vm.ip++)// dereferences vm.ip and moves the pointer more
     #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
