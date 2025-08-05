@@ -10,6 +10,7 @@ VM vm;
 static InterpretResult run(){
     #define READ_BYTE() (*vm.ip++)// dereferences vm.ip and moves the pointer more
     #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
+    printf("\n-----INTERPRETING-----\n\n");
     for (;;){
         #ifdef DEBUG_TRACE_EXECUTION // only for debugging
         disassembleInstruction(vm.chunk, (int)(vm.ip-vm.chunk->code));
@@ -19,21 +20,26 @@ static InterpretResult run(){
             printValue(*slot);
             printf(" ]");
         }
-        print('\n');
+        printf("\n");
         #endif
         uint8_t instruction;
         switch (instruction = READ_BYTE()){
             case OP_CONSTANT:{
                 Value constant = READ_CONSTANT();
+                printf("PUSHED: ");
                 printValue (constant);
                 push(constant);
                 printf("\n");
                 break;
 
             }
+            case OP_NEGATE:{
+                push(-pop());
+                break;
+            }
             case OP_RETURN:{
                 printValue(pop());
-                pringf("\n");
+                printf("\n");
                 return INTERPRET_OK;
             }
 
@@ -48,13 +54,14 @@ InterpretResult interpret(Chunk*chunk){
     return run(); 
 
 }
+static void resetStack(){
+    vm.stackTop = vm.stack;
+}
 void initVM(){
     resetStack();
 
 }
-static void resetStack(){
-    vm.stackTop = vm.stack;
-}
+
 void push(Value value){
     *(vm.stackTop) = value;
     vm.stackTop++;
