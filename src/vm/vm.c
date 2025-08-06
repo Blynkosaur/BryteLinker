@@ -6,7 +6,7 @@
 
 VM vm;
 
-k
+
 static InterpretResult run(){
     #define READ_BYTE() (*vm.ip++)// dereferences vm.ip and moves the pointer more
     #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
@@ -23,7 +23,7 @@ static InterpretResult run(){
         printf("\n");
         #endif
         uint8_t instruction;
-        switch (instruction = READ_BYTE()){
+        switch(instruction = READ_BYTE()){
             case OP_CONSTANT:{
                 Value constant = READ_CONSTANT();
                 printf("PUSHED: ");
