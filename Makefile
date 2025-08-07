@@ -40,3 +40,4 @@ debug.c: debug.h
 chunk.c: chunk.h memory.h
 value.c: value.h memory.h
 vm.c: common.h vm.h
+#daily
