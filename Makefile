@@ -9,9 +9,9 @@ SRC_FILES = main.c debug.c chunk.c value.c vm.c
 
 TARGET_OBJS = $(SRC_FILES:%.c=build/%.o)
 
-vpath %.c src src/bytecode src/vm
+vpath %.c src src/bytecode src/vm src/compiler
 
-vpath %.h include include/bytecode include/vm
+vpath %.h include include/bytecode include/vm include/compiler
 
 build:
 	mkdir -p build
@@ -40,4 +40,6 @@ debug.c: debug.h
 chunk.c: chunk.h memory.h
 value.c: value.h memory.h
 vm.c: common.h vm.h
+compiler.c: compiler.h common.h scanner.h
+scanner.c: common.h scanner.h
 #daily
