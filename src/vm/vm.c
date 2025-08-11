@@ -1,6 +1,7 @@
 #include "../../include/common.h"
 #include "../../include/vm/vm.h"
 #include "../../include/debug.h"
+#include "../../include/compiler/compiler.h"
 #include <stdio.h>
 
 
@@ -79,10 +80,9 @@ static InterpretResult run(){
     #undef READ_CONSTANT
     #undef BINARY_OP
 }
-InterpretResult interpret(Chunk*chunk){
-    vm.chunk = chunk;
-    vm.ip = vm.chunk->code;
-    return run(); 
+InterpretResult interpret(char* source){
+    compile(source);
+    return INTERPRET_OK;
 
 }
 static void resetStack(){
