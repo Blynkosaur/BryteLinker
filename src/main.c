@@ -23,6 +23,13 @@ static void repl(){ //REPL read eval print loop when you just run >>python and p
 
 static char* readFile(char*path){
     FILE* file = fopen(path,"rb");
+    //check for errors
+
+    if (file == NULL){
+        fprintf(stderr, "could not open file \"%s\". \n", path);
+        exit(74);
+    }
+
     //go to the end of the file
     fseek(file,0L, SEEK_END);
     long int file_size = ftell(file);// int of the position of the file as a byte count
@@ -32,7 +39,15 @@ static char* readFile(char*path){
     */
 
     char* buffer = malloc(file_size+1);
+    if (buffer == NULL){
+        fprintf(stderr, "Not enough memory to read \"%s\".\n",path);
+        exit(74);
+    }
     size_t bytesRead = fread(buffer, sizeof(char), file_size, file);
+    if (bytesRead<file_size){
+        fprintf(stderr,"Could not read file \"%s\".\n",path);
+        exit(74);
+    }
     buffer[file_size] = '\0';
     fclose(file);
     return buffer;
