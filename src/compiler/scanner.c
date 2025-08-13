@@ -44,7 +44,7 @@ static char advance(){
     scanner.current++;
     return current_char;
 }
-static bool match (char expected){
+static bool match_next (char expected){
     if (isAtEnd()) return false;
     if (*(scanner.current) == expected) {
         scanner.current ++;
@@ -52,9 +52,44 @@ static bool match (char expected){
     }
     return false;
 }
+static char peek(){
+    return *(scanner.current);
+}
+static char peekNext(){
+    if (isAtEnd()) return '\0'; // in case already at the end of file so can't peek forward anymore
+    return *(scanner.current +1);
+}
+static void skipWhitespace(){
+    while (true){
+        char c = peek();
+        switch (c){
+            case ' ':
+            case '\r':
+            case '\t':
+                advance();
+                break;
+            case '\n':
+                scanner.line++;
+                advance();
+                break;
+            case '#': // for comments
+                while (peekNext != '\n' && !isAtEnd()){
+                    advance();
+                }
+                break;
+
+            default:
+                return;
+
+        }
+    }
+}
 Token scanToken(){
+    skipWhitespace();// before even getting to a token just skip all ts
+    //cooked
     scanner.start= scanner.current;
     if(isAtEnd()) return makeToken(TOKEN_EOF);
+    
     char c = advance();
     switch (c) {
     case '(': return makeToken(TOKEN_LEFT_PAREN);
@@ -70,16 +105,16 @@ Token scanToken(){
     case '*': return makeToken(TOKEN_STAR);
     case '!':
       return makeToken(
-          match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
+          match_next('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
     case '=':
       return makeToken(
-          match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
+          match_next('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
     case '<':
       return makeToken(
-          match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
+          match_next('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
     case '>':
       return makeToken(
-          match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+          match_next('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
   }
     
     return errorToken("Unexpected character.");
