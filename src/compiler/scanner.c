@@ -84,6 +84,16 @@ static void skipWhitespace(){
         }
     }
 }
+static Token string(){
+    while (peek()!= '"'&& !isAtEnd()){
+        if(peek() == '\n' )scanner.line ++;
+        advance();
+    }
+    if  (isAtEnd) return errorToken("Unterminated string.");
+    // for the closing quote.
+    advance();
+    return makeToken(TOKEN_STRING);
+}
 Token scanToken(){
     skipWhitespace();// before even getting to a token just skip all ts
     //cooked
@@ -115,6 +125,8 @@ Token scanToken(){
     case '>':
       return makeToken(
           match_next('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+
+    case '"': return string();
   }
     
     return errorToken("Unexpected character.");
