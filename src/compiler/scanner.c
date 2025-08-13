@@ -94,6 +94,39 @@ static Token string(){
     advance();
     return makeToken(TOKEN_STRING);
 }
+static Token number(){
+    while (isDigit(peek())) advance();
+
+    //fractions fuck me why is that even a thing
+
+    if (peek() =='.' && isDigit(peekNext())){
+        advance();
+
+        while (isDigit(peek())) advance();
+
+    }
+    return makeToken(TOKEN_NUMBER);
+
+
+}
+static bool isDigit(char c){
+    return c >= '0' && c <= '9';
+}
+
+static bool isAlpha(char c){
+    return ((c >= 'a' && c <='z') || (c >= 'A' && c <='Z') || c == '_');
+}
+static TokenType identifierType(){
+    return TOKEN_IDENTIFIER;
+}
+static Token identifier(){
+    while (isAlpha(peek()) || isDigit(peek())) advance;
+    return makeToken(identifierType());
+    // => what the fuck idk why not just return TOKEN_IDENTIFIER
+    // maybe for reserved words or user made identifiers(i.e. variables)
+}
+
+
 Token scanToken(){
     skipWhitespace();// before even getting to a token just skip all ts
     //cooked
@@ -101,6 +134,12 @@ Token scanToken(){
     if(isAtEnd()) return makeToken(TOKEN_EOF);
     
     char c = advance();
+    if (isDigit(c)){
+        return number();
+    }
+    if (isAlpha(c)){
+        return identifier();
+    }
     switch (c) {
     case '(': return makeToken(TOKEN_LEFT_PAREN);
     case ')': return makeToken(TOKEN_RIGHT_PAREN);
