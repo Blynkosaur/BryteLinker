@@ -73,7 +73,7 @@ static void skipWhitespace(){
                 advance();
                 break;
             case '#': // for comments
-                while (peekNext != '\n' && !isAtEnd()){
+                while (peekNext() != '\n' && !isAtEnd()){
                     advance();
                 }
                 break;
@@ -111,6 +111,18 @@ static TokenType identifierType(){
         }
         break;
     }
+    case 't':{
+        if((scanner.current-scanner.start)>1){
+            switch(scanner.start[1]){
+                case 'h': return checkKeyword(2,2,"is", TOKEN_THIS);
+                case 'r': return checkKeyword(2,2, "ue", TOKEN_TRUE);
+            }
+        }
+        break;
+    }
+    default:
+        return TOKEN_IDENTIFIER;
+
   }
 
 }
@@ -119,10 +131,13 @@ static Token string(){
         if(peek() == '\n' )scanner.line ++;
         advance();
     }
-    if  (isAtEnd) return errorToken("Unterminated string.");
+    if  (isAtEnd()) return errorToken("Unterminated string.");
     // for the closing quote.
     advance();
     return makeToken(TOKEN_STRING);
+}
+static bool isDigit(char c){
+    return c >= '0' && c <= '9';
 }
 static Token number(){
     while (isDigit(peek())) advance();
@@ -139,18 +154,14 @@ static Token number(){
 
 
 }
-static bool isDigit(char c){
-    return c >= '0' && c <= '9';
-}
+
 
 static bool isAlpha(char c){
     return ((c >= 'a' && c <='z') || (c >= 'A' && c <='Z') || c == '_');
 }
-static TokenType identifierType(){
-    return TOKEN_IDENTIFIER;
-}
+
 static Token identifier(){
-    while (isAlpha(peek()) || isDigit(peek())) advance;
+    while (isAlpha(peek()) || isDigit(peek())) advance();
     return makeToken(identifierType());
     // => what the fuck idk why not just return TOKEN_IDENTIFIER
     // maybe for reserved words or user made identifiers(i.e. variables)

@@ -80,7 +80,7 @@ static InterpretResult run(){
     #undef READ_CONSTANT
     #undef BINARY_OP
 }
-InterpretResult interpret(char* source){
+InterpretResult interpret(const char* source){
     compile(source);
     return INTERPRET_OK;
 

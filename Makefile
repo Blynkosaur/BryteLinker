@@ -5,7 +5,7 @@ OTHER_FLAGS = -v -g -Wall
 
 LINK_TARGET = build/main
 
-SRC_FILES = main.c debug.c chunk.c value.c vm.c
+SRC_FILES = main.c debug.c chunk.c value.c vm.c compiler.c scanner.c
 
 TARGET_OBJS = $(SRC_FILES:%.c=build/%.o)
 
