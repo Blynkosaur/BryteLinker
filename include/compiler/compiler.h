@@ -1,7 +1,9 @@
 #ifndef bryte_compiler_h
 
 #define bryte_compiler_h
+#include "../common.h"
+#include "../bytecode/chunk.h"
 
-void compile(const char* source);
+bool compile(const char* source, Chunk*chunk);
 
 #endif
