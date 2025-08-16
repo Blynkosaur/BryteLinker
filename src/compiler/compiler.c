@@ -20,6 +20,25 @@ static Chunk* currentChunk(){
 }
 
 Parser parser;
+
+typedef enum {
+  PREC_NONE,
+  PREC_ASSIGNMENT,  // =
+  PREC_OR,          // or
+  PREC_AND,         // and
+  PREC_EQUALITY,    // == !=
+  PREC_COMPARISON,  // < > <= >=
+  PREC_TERM,        // + -
+  PREC_FACTOR,      // * /
+  PREC_UNARY,       // ! -
+  PREC_CALL,        // . ()
+  PREC_PRIMARY
+} Precedence;
+
+
+static void parsePrecedence(Precedence precedence){
+
+}
 //parser scans the tokens and transforms it into the tree/ syntax bullshit, just keep reading
 // do not read these comments please
 static void errorAt (Token * token, const char* message){
@@ -47,13 +66,15 @@ static void errorAtCurrent(const char* message){
 static void advance(){
     parser.previous = parser.current;
     while (1){
-        parser.current = scanToken();
+        parser.current = scanToken();// moves the current token forward
         if(parser.current.type != TOKEN_ERROR) break;
 
         errorAtCurrent(parser.current.start);
     }
 }
+
 static void expression(){
+    parsePrecedence(PREC_ASSIGNMENT);
 
 }
 static void consume(TokenType type, const char* message){
@@ -67,9 +88,26 @@ static void consume(TokenType type, const char* message){
 static void writeByte(uint8_t byte){
     writeChunk(currentChunk(), byte, parser.previous.line);
 }
-static void emitReturn(){
+static void writeReturn(){
     writeByte(OP_RETURN);
+    
 }
+static u_int8_t makeConstant(Value value){
+    int constant_index = addConstant(currentChunk(),value);
+    //gives back the index on the constant array for the chunk
+    if (constant_index > UINT8_MAX){
+        //since all bytecode are all 8 bits, max is 256 soo..... yeah the max array size is also 256 bytes
+        error("Too many constants in one chunk.");
+        return 0;
+    }
+    return (uint8_t) constant_index;
+    
+}
+static void writeConstant(Value value){
+    writeBytes(OP_CONSTANT, makeConstant(value));
+}
+
+
 static void writeBytes(uint8_t byte1, uint8_t byte2){
     writeByte(byte1);
     writeByte(byte2);
@@ -77,6 +115,23 @@ static void writeBytes(uint8_t byte1, uint8_t byte2){
 static void endCompiler(){
     emitReturn();
 }
+static void grouping(){
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+}
+static void unary(){
+    TokenType operatorType = parser.previous.type;
+    expression();
+    switch(operatorType){
+        case TOKEN_MINUS: writeByte(OP_NEGATE);break;
+        default: return;
+    }
+}
+static void number(){
+    double value = strtod(parser.previous.start, NULL);
+    emitConstatn(value);
+}
+
 
 
 
@@ -89,6 +144,7 @@ bool compile (const char* source, Chunk* chunk){
     expression();
     consume(TOKEN_EOF, "Expected end of expression.");
     endCompiler();
+
     return !parser.hadError;
 
 
