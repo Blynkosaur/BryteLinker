@@ -122,10 +122,14 @@ static void grouping(){
 static void unary(){
     TokenType operatorType = parser.previous.type;
     expression();
+    parsePrecedence(PREC_UNARY);// maybe take this off idk what this is
     switch(operatorType){
         case TOKEN_MINUS: writeByte(OP_NEGATE);break;
         default: return;
     }
+}
+static void binary(){
+    Toke
 }
 static void number(){
     double value = strtod(parser.previous.start, NULL);
