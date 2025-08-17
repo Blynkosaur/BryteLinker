@@ -101,7 +101,8 @@ static void advance()
     while (1)
     {
         parser.current = scanToken(); // moves the current token forward
-        if (parser.current.type != TOKEN_ERROR)
+        if (parser.current.type != TOKEN_ERROR)// lwk retarded, only loops if there is an error
+            
             break;
 
         errorAtCurrent(parser.current.start);
@@ -167,7 +168,7 @@ static void grouping()
 static void unary()
 {
     TokenType operatorType = parser.previous.type;
-    expression();
+    // expression();
     parsePrecedence(PREC_UNARY); // maybe take this off idk what this is
     switch (operatorType)
     {
