@@ -16,6 +16,12 @@ static void repl(){ //REPL read eval print loop when you just run >>python and p
             
             break;
         }
+        if (strncmp(line, "quit()",6)==0){
+            
+            fprintf(stdout, "Exited\n");
+            break;
+            
+        }
         interpret(line);
     }
 
