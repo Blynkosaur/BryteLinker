@@ -20,13 +20,8 @@ static Chunk *currentChunk()
 
 Parser parser;
 typedef void (*Parsefunc)();// weird as shit pointer to a void function
-typedef struct
-{
-    Parsefunc prefix;
-    Parsefunc infix;
-    Precedence precedence;
 
-}ParseRule;
+
 
 typedef enum {
     PREC_NONE,
@@ -41,9 +36,33 @@ typedef enum {
     PREC_CALL,       // . ()
     PREC_PRIMARY
 } Precedence;
-
-static void parsePrecedence(Precedence precedence)
+typedef struct
 {
+    Parsefunc prefix;
+    Parsefunc infix;
+    Precedence precedence;
+
+}ParseRule;
+
+static void expression();
+static ParseRule* getRule(TokenType type);
+static void parsePrecedence(Precedence precedence);
+static void advance();
+static void error(const char *message);
+
+static void parsePrecedence(Precedence precedence){
+    advance();
+    Parsefunc prefixRule = getRule(parser.previous.type)->prefix;
+    if(prefixRule == NULL){
+        error("Expression expected.");
+        return;
+    }
+    prefixRule();
+    while (precedence <= getRule(parser.current.type)->precedence){
+        advance(); // --> parses the expression until finds something with lower precedence
+        Parsefunc infixRule = getRule(parser.previous.type)->infix;
+        infixRule();
+    }
 }
 // parser scans the tokens and transforms it into the tree/ syntax bullshit, just keep reading
 //  do not read these comments please
@@ -123,20 +142,23 @@ static u_int8_t makeConstant(Value value)
     }
     return (uint8_t)constant_index;
 }
-static void writeConstant(Value value)
-{
-    writeBytes(OP_CONSTANT, makeConstant(value));
-}
+
 
 static void writeBytes(uint8_t byte1, uint8_t byte2)
 {
     writeByte(byte1);
     writeByte(byte2);
 }
+
+static void writeConstant(Value value)
+{
+    writeBytes(OP_CONSTANT, makeConstant(value));
+}
 static void endCompiler()
 {
-    emitReturn();
+    writeReturn();
 }
+
 static void grouping()
 {
     expression();
@@ -155,6 +177,35 @@ static void unary()
     default:
         return;
     }
+}
+
+static void binary()
+{
+    TokenType operatorType = parser.previous.type;
+    ParseRule *rule = getRule(operatorType);
+    parsePrecedence((Precedence)(rule->precedence + 1));
+    switch (operatorType)
+    {
+    case TOKEN_PLUS:
+        writeByte(OP_ADD);
+        break;
+    case TOKEN_MINUS:
+        writeByte(OP_SUBSTRACT);
+        break;
+    case TOKEN_STAR:
+        writeByte(OP_MULITPLY);
+        break;
+    case TOKEN_SLASH:
+        writeByte(OP_DIVIDE);
+        break;
+    default:
+        return;
+    }
+}
+static void number()
+{
+    double value = strtod(parser.previous.start, NULL);
+    writeConstant(value);
 }
 ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},
@@ -198,34 +249,10 @@ ParseRule rules[] = {
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_EOF]           = {NULL,     NULL,   PREC_NONE},
 };
-static void binary()
-{
-    TokenType operatorType = parser.previous.type;
-    ParseRule *rule = getRule(operatorType);
-    parsePrecedence((Precedence)(rule->precedence + 1));
-    switch (operatorType)
-    {
-    case TOKEN_PLUS:
-        writeByte(OP_ADD);
-        break;
-    case TOKEN_MINUS:
-        writeByte(OP_SUBSTRACT);
-        break;
-    case TOKEN_STAR:
-        writeByte(OP_MULITPLY);
-        break;
-    case TOKEN_SLASH:
-        writeByte(OP_DIVIDE);
-        break;
-    default:
-        return;
-    }
+static ParseRule* getRule(TokenType type){
+    return &rules[type];
 }
-static void number()
-{
-    double value = strtod(parser.previous.start, NULL);
-    emitConstatn(value);
-}
+
 
 bool compile(const char *source, Chunk *chunk)
 {
@@ -237,6 +264,12 @@ bool compile(const char *source, Chunk *chunk)
     expression();
     consume(TOKEN_EOF, "Expected end of expression.");
     endCompiler();
+    #ifdef DEBUG_PRINT_CODE
+    #include "../../include/debug.h"
+    if(!parser.hadError){
+        disassembleChunk(currentChunk(),"code");
+    }
+    #endif
 
     return !parser.hadError;
 }
