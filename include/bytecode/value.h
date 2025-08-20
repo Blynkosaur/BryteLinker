@@ -22,6 +22,9 @@ typedef struct{
 #define BOOL_VAL(value) ((Value) {.type = VAL_BOOL , .payload = {.boolean = value}})
 #define NIL_VAL ((Value) {.type = VAL_NIL, .payload = {.number = 0}})
 #define NUMBER_VAL(value) ((Value) {.type = VAL_NUMBER, .payload = {.number = value}})
+
+#define PAYLOAD_BOOL(value) ((value).as.boolean)
+#define PAYLOAD_Number(value) ((value).as.number)
 typedef struct{
     int capacity;
     int count;
