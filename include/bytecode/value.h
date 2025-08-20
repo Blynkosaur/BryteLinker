@@ -6,7 +6,7 @@
 
 typedef enum {
     VAL_BOOL,
-    VAL_NIL,
+    VAL_NULL,
     VAL_NUMBER
 } ValueType;
 
@@ -20,16 +20,16 @@ typedef struct{
 }Value;
 // just for fun this is a pointer to a function that doesnt return anything: -->typedef void (*ptr) ()
 #define BOOL_VAL(value) ((Value) {.type = VAL_BOOL , .payload = {.boolean = value}})
-#define NIL_VAL ((Value) {.type = VAL_NIL, .payload = {.number = 0}})
+#define NULL_VAL ((Value) {.type = VAL_NULL, .payload = {.number = 0}})
 #define NUMBER_VAL(value) ((Value) {.type = VAL_NUMBER, .payload = {.number = value}})
 
 
 #define PAYLOAD_BOOL(value) ((value).payload.boolean)
 #define PAYLOAD_NUMBER(value) ((value).payload.number)
 
-#define IS_BOOL(value) {(value).type == VAL_BOOL}
-#define IS_NUMBER(value) {(value).type == VAL_NUMBER}
-#define IS_NIL(value) {(value).type == VAL_NIL}
+#define IS_BOOL(value) ((value).type == VAL_BOOL)
+#define IS_NUMBER(value) ((value).type == VAL_NUMBER)
+#define IS_NULL(value) ((value).type == VAL_NULL)
 typedef struct{
     int capacity;
     int count;

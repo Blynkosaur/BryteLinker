@@ -6,6 +6,9 @@
 
 typedef enum {
     OP_CONSTANT,
+    OP_NULL,
+    OP_TRUE,
+    OP_FALSE,
     OP_ADD,
     OP_SUBSTRACT,
     OP_MULITPLY,

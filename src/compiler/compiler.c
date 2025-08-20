@@ -56,7 +56,7 @@ static void parsePrecedence(Precedence precedence){
     if(prefixRule == NULL){
         error("Expression expected.");
         return;
-    }
+    } 
     prefixRule();
     while (precedence <= getRule(parser.current.type)->precedence){
         advance(); // --> parses the expression until finds something with lower precedence
@@ -108,7 +108,24 @@ static void advance()
         errorAtCurrent(parser.current.start);
     }
 }
+static void literal(){
+    switch (parser.previous.type){
+        case TOKEN_FALSE:{
+            writeByte(OP_FALSE);
+            break;
+        }case TOKEN_TRUE:{
+            writeByte(OP_TRUE);
+            break;
+            
+        }case TOKEN_NULL:{
+            writeByte(OP_NULL);
+            break;
+        }default:
+            return; 
+    }// no need to advance anywhere since the prefix is automatically
+    // consumed in "parsePrecendence"
 
+}
 static void expression()
 {
     parsePrecedence(PREC_ASSIGNMENT);
@@ -138,6 +155,7 @@ static u_int8_t makeConstant(Value value)
     if (constant_index > UINT8_MAX)
     {
         // since all bytecode are all 8 bits, max is 256 soo..... yeah the max array size is also 256 bytes
+        // all bytecode is 8/bits one byte --> so the maximum index for the value array is also 256-1
         error("Too many constants in one chunk.");
         return 0;
     }
@@ -234,17 +252,17 @@ ParseRule rules[] = {
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_FALSE]         = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_FALSE]         = {literal,     NULL,   PREC_NONE},
   [TOKEN_FOR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_FUN]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_IF]            = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_NIL]           = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_NULL]           = {literal,     NULL,   PREC_NONE},
   [TOKEN_OR]            = {NULL,     NULL,   PREC_NONE},
   [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_TRUE]          = {NULL,     NULL,   PREC_NONE},
+  [TOKEN_TRUE]          = {literal,     NULL,   PREC_NONE},
   [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
