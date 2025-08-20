@@ -18,7 +18,7 @@ typedef struct{
     }payload;
 
 }Value;
-
+// just for fun this is a pointer to a function that doesnt return anything: -->typedef void (*ptr) ()
 #define BOOL_VAL(value) ((Value) {.type = VAL_BOOL , .payload = {.boolean = value}})
 #define NIL_VAL ((Value) {.type = VAL_NIL, .payload = {.number = 0}})
 #define NUMBER_VAL(value) ((Value) {.type = VAL_NUMBER, .payload = {.number = value}})
