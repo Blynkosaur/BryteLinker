@@ -206,7 +206,7 @@ static void binary()
 static void number()
 {
     double value = strtod(parser.previous.start, NULL);
-    writeConstant(value);
+    writeConstant(NUMBER_VAL(value));
 }
 ParseRule rules[] = {
   [TOKEN_LEFT_PAREN]    = {grouping, NULL,   PREC_NONE},

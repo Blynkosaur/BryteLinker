@@ -2,6 +2,7 @@
 #include "../../include/vm/vm.h"
 #include "../../include/debug.h"
 #include "../../include/compiler/compiler.h"
+
 #include <stdio.h>
 
 
@@ -52,7 +53,8 @@ static InterpretResult run(){
             }
             case OP_NEGATE:{
                 
-                // push(-pop());
+                // push(-pop());]
+                if(!IS_NUMBER)
                 *(vm.stackTop-1) *= -1;
                 break;
             }

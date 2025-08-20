@@ -23,8 +23,13 @@ typedef struct{
 #define NIL_VAL ((Value) {.type = VAL_NIL, .payload = {.number = 0}})
 #define NUMBER_VAL(value) ((Value) {.type = VAL_NUMBER, .payload = {.number = value}})
 
-#define PAYLOAD_BOOL(value) ((value).as.boolean)
-#define PAYLOAD_Number(value) ((value).as.number)
+
+#define PAYLOAD_BOOL(value) ((value).payload.boolean)
+#define PAYLOAD_NUMBER(value) ((value).payload.number)
+
+#define IS_BOOL(value) {(value).type == VAL_BOOL}
+#define IS_NUMBER(value) {(value).type == VAL_NUMBER}
+#define IS_NIL(value) {(value).type == VAL_NIL}
 typedef struct{
     int capacity;
     int count;
