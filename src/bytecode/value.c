@@ -33,5 +33,13 @@ void freeValueArray(ValueArray*array){
 }
 
 void printValue(Value value){
-    printf("%g", PAYLOAD_NUMBER(value));
+    switch (value.type){
+        case VAL_BOOL:
+            printf(value.payload.boolean? "true": "false");
+            break;
+        case VAL_NULL: printf("NULL"); break;
+        case VAL_NUMBER:
+            printf("%g", PAYLOAD_NUMBER(value));
+    }
+    
 }

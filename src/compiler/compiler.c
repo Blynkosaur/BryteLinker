@@ -194,6 +194,8 @@ static void unary()
     case TOKEN_MINUS:
         writeByte(OP_NEGATE);
         break;
+    case TOKEN_BANG:
+        
     default:
         return;
     }
