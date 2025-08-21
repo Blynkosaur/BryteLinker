@@ -96,14 +96,15 @@ static InterpretResult run(){
                 push(BOOL_VAL(true));
                 break;
             }
+            case OP_NOT:{
+                Value last = pop();
+                Value new = BOOL_VAL(MAKE_NOT(last));
+                push(new);
+            }
             case OP_RETURN:{
                 printValue(pop());
                 printf("\n");
                 return INTERPRET_OK;
-            }
-            default:{
-                runtimeError("Unknown opcode %d", instruction);
-                return INTERPRET_RUNTIME_ERROR;
             }
 
         }

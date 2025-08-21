@@ -30,6 +30,9 @@ typedef struct{
 #define IS_BOOL(value) ((value).type == VAL_BOOL)
 #define IS_NUMBER(value) ((value).type == VAL_NUMBER)
 #define IS_NULL(value) ((value).type == VAL_NULL)
+
+//value is either a bool Value (struct) or NULL
+#define MAKE_NOT(value) (IS_NULL(value) || (IS_BOOL(value) && !value.payload.boolean))
 typedef struct{
     int capacity;
     int count;
