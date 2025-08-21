@@ -89,17 +89,21 @@ static InterpretResult run(){
                 break;
             }
             case OP_FALSE:{
-                push(BOOL_VAL(true));
+                push(BOOL_VAL(false));
                 break;
             }
             case OP_TRUE:{
-                push(BOOL_VAL(false));
+                push(BOOL_VAL(true));
                 break;
             }
             case OP_RETURN:{
                 printValue(pop());
                 printf("\n");
                 return INTERPRET_OK;
+            }
+            default:{
+                runtimeError("Unknown opcode %d", instruction);
+                return INTERPRET_RUNTIME_ERROR;
             }
 
         }

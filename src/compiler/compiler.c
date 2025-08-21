@@ -49,6 +49,7 @@ static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 static void advance();
 static void error(const char *message);
+static void writeByte(uint8_t byte);
 
 static void parsePrecedence(Precedence precedence){
     advance();
@@ -70,7 +71,7 @@ static void errorAt(Token *token, const char *message)
 {
     if (parser.cooked)
         return;
-    fprintf(stderr, "[line %d] Error", token->line);
+    fprintf(stderr, "[line %d] Error ", token->line);
     if (token->type == TOKEN_EOF)
     {
         fprintf(stderr, " at end");
@@ -81,7 +82,7 @@ static void errorAt(Token *token, const char *message)
     }
     else
     {
-        fprintf(stderr, "at '%.*s", token->length, token->start);
+        fprintf(stderr, "at '%.*s'", token->length, token->start);
     }
     fprintf(stderr, ": %s\n", message);
     parser.hadError = true;
@@ -252,17 +253,17 @@ ParseRule rules[] = {
   [TOKEN_AND]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_CLASS]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ELSE]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_FALSE]         = {literal,     NULL,   PREC_NONE},
+  [TOKEN_FALSE]         = {literal,  NULL,   PREC_NONE},
   [TOKEN_FOR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_FUN]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_IF]            = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_NULL]           = {literal,     NULL,   PREC_NONE},
+  [TOKEN_NULL]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_OR]            = {NULL,     NULL,   PREC_NONE},
   [TOKEN_PRINT]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_RETURN]        = {NULL,     NULL,   PREC_NONE},
   [TOKEN_SUPER]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_THIS]          = {NULL,     NULL,   PREC_NONE},
-  [TOKEN_TRUE]          = {literal,     NULL,   PREC_NONE},
+  [TOKEN_TRUE]          = {literal,  NULL,   PREC_NONE},
   [TOKEN_VAR]           = {NULL,     NULL,   PREC_NONE},
   [TOKEN_WHILE]         = {NULL,     NULL,   PREC_NONE},
   [TOKEN_ERROR]         = {NULL,     NULL,   PREC_NONE},
