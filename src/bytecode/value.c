@@ -32,6 +32,18 @@ void freeValueArray(ValueArray*array){
     initValueArray(array);
 }
 
+bool isEqual(Value a, Value b){
+    if (a.type != b.type){
+        return false;
+    }
+    switch (a.type){
+        case VAL_BOOL: return PAYLOAD_BOOL(a) == PAYLOAD_BOOL(b);
+        case VAL_NULL: return true;
+        case VAL_NUMBER: return PAYLOAD_NUMBER(a) == PAYLOAD_NUMBER(b);
+        default: return false;
+    }
+}
+
 void printValue(Value value){
     switch (value.type){
         case VAL_BOOL:
