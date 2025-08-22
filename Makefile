@@ -5,7 +5,7 @@ OTHER_FLAGS = -v -g -Wall
 
 LINK_TARGET = build/main
 
-SRC_FILES = main.c debug.c chunk.c value.c vm.c compiler.c scanner.c object.c
+SRC_FILES = main.c debug.c chunk.c value.c vm.c compiler.c scanner.c object.c memory.c
 
 TARGET_OBJS = $(SRC_FILES:%.c=build/%.o)
 
@@ -43,7 +43,7 @@ vm.c: common.h vm.h
 compiler.c: compiler.h common.h scanner.h
 scanner.c: common.h scanner.h
 object.c: object.h vm.h value.h memory.h
-memory.c: object.h vmh. memory.h
+memory.c: object.h vm.h memory.h
 
 
 #daily

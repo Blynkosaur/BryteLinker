@@ -6,7 +6,7 @@
 void * grow_array(size_t size_of_type, void * pointer, int oldCount, int newCount);
 
 
-void * freeObjects();
+void freeObjects();
 
 #endif
 
