@@ -102,7 +102,7 @@ static InterpretResult run()
                 runtimeError("Operands must be two numbers (addition) or two strings (concatenation)");
                 return INTERPRET_RUNTIME_ERROR;
             }
-            BINARY_OP(NUMBER_VAL, +);
+            // BINARY_OP(NUMBER_VAL, +);
             break;
         }
         case OP_SUBSTRACT:
@@ -202,7 +202,8 @@ InterpretResult interpret(const char *source)
 }
 
 void initVM()
-{
+{   
+    vm.objectsHead = NULL;
     resetStack();
 }
 
@@ -219,6 +220,7 @@ Value pop()
 }
 void freeVM()
 {
+    freeObjects();
 }
 // typedef struct{
 //     Chunk*chunk;

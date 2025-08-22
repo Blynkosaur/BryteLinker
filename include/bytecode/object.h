@@ -11,6 +11,7 @@ typedef enum{
 
 struct Obj {
     ObjType type;
+    Obj* next; // --> intrusive linkedlist whatever that is. Cuz we're not making another linkedlist
  };
 
  struct StringObj{

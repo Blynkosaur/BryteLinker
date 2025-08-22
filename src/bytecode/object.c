@@ -18,6 +18,8 @@
 //FOR THE RECORD, IDK WHY THE CODE ABOVE IS EVEN THERE WHY SO COMPLICATED, JUST CALL MALLOC: IT AIN'T THAT DEEP
 static StringObj* allocateString(char* chars, int length){
     StringObj* string = malloc(sizeof(StringObj));
+    string->obj.next = vm.objectsHead;
+    vm.objectsHead = (Obj*)string;
     string -> chars = chars;
     string ->length = length;
     return string;

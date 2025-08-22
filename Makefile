@@ -43,6 +43,7 @@ vm.c: common.h vm.h
 compiler.c: compiler.h common.h scanner.h
 scanner.c: common.h scanner.h
 object.c: object.h vm.h value.h memory.h
+memory.c: object.h vmh. memory.h
 
 
 #daily

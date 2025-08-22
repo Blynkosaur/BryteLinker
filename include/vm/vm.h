@@ -8,8 +8,11 @@ typedef struct{
     uint8_t* ip;
     Value stack[STACK_MAX];
     Value *stackTop;
+    Obj* objectsHead;
 
 }VM;
+
+extern VM vm;
 
 void push(Value value);
 Value pop();
