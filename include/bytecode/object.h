@@ -13,14 +13,14 @@ struct Obj {
     ObjType type;
  };
 
- typedef struct{
+ struct StringObj{
     Obj obj;// --> extends Obj struct so some kind of inheritance
     /*having obj as StringObj's first field means that they are aligned
     So basically you can cast StringObj* to Obj* and call it's attributes (e.g type)*/
     int length;
     char* chars;
 
- }StringObj;
+ };
 
 
  void printObject(Value value);

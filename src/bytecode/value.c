@@ -46,7 +46,7 @@ bool isEqual(Value a, Value b){
         case VAL_OBJ:{
             StringObj* aString = PAYLOAD_STRING(a);
             StringObj* bString = PAYLOAD_STRING(b);
-            return aString->length == bString->length && strcmpt(aString->chars,bString->chars)==0 ;
+            return aString->length == bString->length && strcmp(aString->chars,bString->chars)==0 ;
 
         }
 

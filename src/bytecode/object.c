@@ -33,6 +33,6 @@ StringObj* copyString(const char* chars, int length){
 void printObject(Value value){
     switch(OBJ_TYPE(value)){
         case OBJ_STRING:
-        print("%s", PAYLOAD_CSTRING(value));
+        printf("%s", PAYLOAD_CSTRING(value));
     }
 }
