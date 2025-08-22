@@ -39,4 +39,6 @@ static inline bool isObjType(Value value, ObjType type){
 #define PAYLOAD_CSTRING(value) (((StringObj*)(PAYLOAD_OBJ(value)))->chars)
 StringObj* copyString(const char* chars, int length);
 
+StringObj* makeObjWithString(char* chars, int length);
+
 #endif

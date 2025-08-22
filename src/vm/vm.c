@@ -2,8 +2,12 @@
 #include "../../include/vm/vm.h"
 #include "../../include/debug.h"
 #include "../../include/compiler/compiler.h"
+#include "../../include/bytecode/object.h"
+#include "../../include/memory.h"
 #include <stdarg.h>
 #include <stdio.h>
+#include <string.h>
+
 
 VM vm;
 
@@ -30,6 +34,21 @@ static void runtimeError(const char *format, ...)
 }
 static bool isFalsey(Value value) {
   return IS_NULL(value) || (IS_BOOL(value) && !PAYLOAD_BOOL(value));
+}
+
+static void concatenate(){
+    StringObj * last = PAYLOAD_STRING(pop());
+    StringObj * second_last = PAYLOAD_STRING(pop());
+    int new_len = last->length  + second_last->length;
+    char* concat = malloc(sizeof(char)*new_len +1);
+    strcpy(concat, second_last->chars);
+    strcat(concat, last -> chars);
+    concat[new_len] = '\0';
+
+    StringObj* result = makeObjWithString(concat,new_len);
+    push(OBJ_VAL(result));
+    
+
 }
 
 static InterpretResult run()
@@ -70,7 +89,19 @@ static InterpretResult run()
         case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
         case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
         case OP_ADD:
-        {
+        {   
+            if(IS_STRING(peek(0)) && IS_STRING(peek(1))){
+                concatenate();
+                
+            }else if (IS_NUMBER(peek(0)) && IS_NUMBER(peek(1))){
+                double last = PAYLOAD_NUMBER(pop());
+                double second_last = PAYLOAD_NUMBER(pop());
+                push(NUMBER_VAL(last+second_last));
+
+            }else{
+                runtimeError("Operands must be two numbers (addition) or two strings (concatenation)");
+                return INTERPRET_RUNTIME_ERROR;
+            }
             BINARY_OP(NUMBER_VAL, +);
             break;
         }
@@ -85,7 +116,8 @@ static InterpretResult run()
             break;
         }
         case OP_DIVIDE:
-        {
+        {   
+            
             BINARY_OP(NUMBER_VAL, /);
             break;
         }

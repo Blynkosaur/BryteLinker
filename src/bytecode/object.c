@@ -24,7 +24,7 @@ static StringObj* allocateString(char* chars, int length){
 }
 
 StringObj* copyString(const char* chars, int length){
-    char* heapChars = malloc(sizeof(char)*length);
+    char* heapChars = malloc(sizeof(char)*length+1);
     memcpy(heapChars,chars,length);
     heapChars[length] = '\0';
     return allocateString(heapChars,length);
@@ -35,4 +35,8 @@ void printObject(Value value){
         case OBJ_STRING:
         printf("%s", PAYLOAD_CSTRING(value));
     }
+}
+
+StringObj* makeObjWithString(char* chars, int length){
+    return allocateString(chars,length);
 }
