@@ -1,5 +1,7 @@
 #include "../../include/bytecode/value.h"
 #include "../../include/memory.h"
+#include "../../include/bytecode/object.h"
+#include <string.h>
 
 
 #include <stdio.h>
@@ -40,9 +42,18 @@ bool isEqual(Value a, Value b){
         case VAL_BOOL: return PAYLOAD_BOOL(a) == PAYLOAD_BOOL(b);
         case VAL_NULL: return true;
         case VAL_NUMBER: return PAYLOAD_NUMBER(a) == PAYLOAD_NUMBER(b);
+
+        case VAL_OBJ:{
+            StringObj* aString = PAYLOAD_STRING(a);
+            StringObj* bString = PAYLOAD_STRING(b);
+            return aString->length == bString->length && strcmpt(aString->chars,bString->chars)==0 ;
+
+        }
+
         default: return false;
     }
 }
+
 
 void printValue(Value value){
     switch (value.type){
@@ -52,6 +63,8 @@ void printValue(Value value){
         case VAL_NULL: printf("NULL"); break;
         case VAL_NUMBER:
             printf("%g", PAYLOAD_NUMBER(value));
+        case VAL_OBJ:
+            printObject(value);
     }
     
 }

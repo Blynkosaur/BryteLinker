@@ -23,6 +23,7 @@ struct Obj {
  }StringObj;
 
 
+ void printObject(Value value);
 
 
 //reminder: OBJ_VAL has a type "obj" and the payload is a pointer the the object struct
