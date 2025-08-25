@@ -20,7 +20,7 @@ typedef struct {
 
 void initTable(Table* table);
 void free(Table* table);
-void insert(Table* table, StringObj* key, Value value );
+bool insert(Table* table, StringObj* key, Value value );
 void lookup(Table* table, StringObj* key);
 
 

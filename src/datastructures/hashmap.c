@@ -17,4 +17,7 @@ void freeTable(Table*table){
     free(table->entries);
     initTable(table);
 }
+bool insert(Table* table, Value value, StringObj* key){
+    
+}
 
