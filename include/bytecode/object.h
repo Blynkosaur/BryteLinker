@@ -20,6 +20,7 @@ struct Obj {
     So basically you can cast StringObj* to Obj* and call it's attributes (e.g type)*/
     int length;
     char* chars;
+    uint32_t hash;
 
  };
 
