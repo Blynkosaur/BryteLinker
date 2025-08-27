@@ -15,7 +15,7 @@ Value value;
 typedef struct {
     int count;
     int capacity;
-    Entry* entries;
+    Entry** entries;
 }Table;
 
 void initTable(Table* table);
