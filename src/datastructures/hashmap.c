@@ -39,7 +39,7 @@ void freeTable(Table *table)
     initTable(table);
 }
 static Entry DELETED_ENTRY = {.key = NULL, .value = 0};
-static Entry *lookUp(Table *table, StringObj *key) // returns the index
+Entry *lookUp(Table *table, StringObj *key) // returns the index
 {
     int capacity = table->capacity;
     char *string_key = key->chars;
@@ -76,7 +76,7 @@ static int get_index(Table *table, StringObj *key)
     }
     return -1;
 }
-void growTable(Table *table, int new_size)
+static void growTable(Table *table, int new_size)
 {
     if (new_size < BASE_SIZE)
     {

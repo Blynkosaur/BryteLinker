@@ -19,9 +19,12 @@ typedef struct {
 }Table;
 
 void initTable(Table* table);
-void free(Table* table);
-bool insert(Table* table, StringObj* key, Value value );
-void lookup(Table* table, StringObj* key);
+void freeTable(Table* table);
+bool set(Table* table, Value value, StringObj* key );
+Entry* lookUp(Table* table, StringObj* key);
 
+bool delete(Table *table, StringObj *key);
+void growTable(Table *table, int new_size);
 
+bool delete(Table *table, StringObj *key);
 #endif
