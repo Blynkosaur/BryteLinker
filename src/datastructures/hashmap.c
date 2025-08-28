@@ -4,7 +4,7 @@
 #include "../../include/memory.h"
 #include <stdlib.h>
 #include <string.h>
-#include "../../include/datastructures/hashtable.h"
+#include "../../include/datastructures/hashmap.h"
 #define PRIME 151
 #define BASE_SIZE 32
 
@@ -123,7 +123,7 @@ bool set(Table *table, Value value, StringObj *key)
     table->count ++;
     return true;
 }
-bool delete(Table *table, StringObj *key)
+bool delete_entry(Table *table, StringObj *key)
 {
     int index = get_index(table, key);
     Entry *temp_ptr = table->entries[index];

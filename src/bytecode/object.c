@@ -41,7 +41,7 @@ StringObj *copyString(const char *chars, int length)
     char *heapChars = malloc(sizeof(char) * length + 1);
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
-    uint32_t hash = hashString(chars, length);
+    uint32_t hash = hashFunc(chars, length);
     return allocateString(heapChars, length, hash);
 }
 
@@ -54,7 +54,8 @@ void printObject(Value value)
     }
 }
 
-StringObj *makeObjWithString(char *chars, int length, int hash)
+StringObj *makeObjWithString(char *chars, int length)
 {
+    uint32_t hash = hashFunc(chars,length);
     return allocateString(chars, length, hash);
 }

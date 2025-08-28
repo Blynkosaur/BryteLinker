@@ -23,8 +23,7 @@ void freeTable(Table* table);
 bool set(Table* table, Value value, StringObj* key );
 Entry* lookUp(Table* table, StringObj* key);
 
-bool delete(Table *table, StringObj *key);
 void growTable(Table *table, int new_size);
 
-bool delete(Table *table, StringObj *key);
+bool delete_entry(Table *table, StringObj *key);
 #endif
