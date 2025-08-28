@@ -28,6 +28,13 @@ static int hash(const char *string, const int prime, const int capacity)
 }
 void freeTable(Table *table)
 {
+    for (int i = 0; i < table->capacity; i++)
+    {
+        if (table->entries[i]!= &DELETED_ENTRY){
+
+        free(table->entries[i]);
+        }
+    }
     free(table->entries);
     initTable(table);
 }
@@ -79,27 +86,42 @@ void growTable(Table *table, int new_size)
     new_table->capacity = new_size;
     new_table->count = 0;
     new_table->entries = calloc(new_size, sizeof(Entry));
+    for (int i = 0; i < table->capacity; i++){
+        if(table->entries[i] != NULL && table->entries[i] != &DELETED_ENTRY){
+            set(new_table, table->entries[i]->value, table->entries[i]->key );
+        }
+    }
+    Table * temp_table = table;
+    freeTable(temp_table);
 
-    return new_table;
+    table = new_table;
 }
+
 bool set(Table *table, Value value, StringObj *key)
 {
     Entry *lookup = lookUp(table, key);
     if (lookup != NULL)
     { // just changing the value that's already there
         lookup->value = value;
-        return true;
+        return false;
+    }
+    if ((table->count / table->capacity) > 0.7)
+    {
+        growTable(table, table->capacity * 2);
     }
     // TODO: EXPAND THE HASHMAP OR DECREASE ITS SIZE DYNAMICALLY I AM WAY TO TIRED FOR THIS SHIT
     Entry *new_entry = malloc(sizeof(Entry));
     new_entry->key = key;
     new_entry->value = value;
     int init_index = key->hash % (table->capacity);
+
     while ((table->entries)[init_index] != NULL)
     {
         init_index++;
     }
     table->entries[init_index] = new_entry;
+    table->count ++;
+    return true;
 }
 bool delete(Table *table, StringObj *key)
 {
@@ -107,5 +129,10 @@ bool delete(Table *table, StringObj *key)
     Entry *temp_ptr = table->entries[index];
     free(temp_ptr);
     table->entries[index] = &(DELETED_ENTRY);
+    table->count--;
     // NOW RESIZE DOWN IF COUNT IS SMALLER THAN 10%
+    if ((table->count / table->capacity) < 0.1)
+    {
+        growTable(table, table->capacity/2);
+    }
 }
