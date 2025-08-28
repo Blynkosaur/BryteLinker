@@ -66,16 +66,29 @@ static int get_index(Table *table, StringObj *key)
     uint32_t init_hash = key->hash % (table->capacity);
     int index = init_hash;
     Entry *current = table->entries[index];
-
-    while (current != NULL)
+for (int i = 0; i < table->capacity; i++)
     {
-        if (strlen(current->key->chars) && strcmp(key->chars, current->key->chars) == 0 && current != &DELETED_ENTRY)
+        int index = (init_hash + i) % table->capacity;
+        Entry *current = table->entries[index];
+        if (current == NULL)
+        {
+            return -1;
+        }
+        if (current != &DELETED_ENTRY &&
+            strcmp(current->key->chars, key->chars) == 0)
         {
             return index;
         }
-        index++;
     }
-    return -1;
+    // while (current != NULL)
+    // {
+    //     if (strlen(current->key->chars) && strcmp(key->chars, current->key->chars) == 0 && current != &DELETED_ENTRY)
+    //     {
+    //         return index;
+    //     }
+    //     index++;
+    // }
+    // return -1;
 }
 static void growTable(Table *table, int new_size)
 {
@@ -83,21 +96,21 @@ static void growTable(Table *table, int new_size)
     {
         return;
     }
-    Table *new_table = malloc(sizeof(Table));
-    new_table->capacity = new_size;
-    new_table->count = 0;
-    new_table->entries = calloc(new_size, sizeof(Entry *));
+    Table new_table;
+    initTable(&new_table); 
+    new_table.capacity = new_size;
+    new_table.count = 0;
+    new_table.entries = calloc(new_size, sizeof(Entry *));
     for (int i = 0; i < table->capacity; i++)
     {
         if (table->entries[i] != NULL && table->entries[i] != &DELETED_ENTRY)
         {
-            set(new_table, table->entries[i]->value, table->entries[i]->key);
+            set(&new_table, table->entries[i]->value, table->entries[i]->key);
         }
     }
-    Table *temp_table = table;
-    freeTable(temp_table);
+    freeTable(table);
 
-    table = new_table;
+    *table = new_table;
 }
 
 bool set(Table *table, Value value, StringObj *key)
