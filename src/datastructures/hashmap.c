@@ -61,13 +61,13 @@ Entry *lookUp(Table *table, StringObj *key) // returns the index
         }
     }
     return NULL;
-    }
+}
 static int get_index(Table *table, StringObj *key)
 {
     uint32_t init_hash = key->hash % (table->capacity);
     int index = init_hash;
     Entry *current = table->entries[index];
-for (int i = 0; i < table->capacity; i++)
+    for (int i = 0; i < table->capacity; i++)
     {
         int index = (init_hash + i) % table->capacity;
         Entry *current = table->entries[index];
@@ -80,8 +80,9 @@ for (int i = 0; i < table->capacity; i++)
         {
             return index;
         }
-        return -1;
     }
+
+    return -1;
     // while (current != NULL)
     // {
     //     if (strlen(current->key->chars) && strcmp(key->chars, current->key->chars) == 0 && current != &DELETED_ENTRY)
@@ -99,7 +100,7 @@ static void growTable(Table *table, int new_size)
         return;
     }
     Table new_table;
-    initTable(&new_table); 
+    initTable(&new_table);
     new_table.capacity = new_size;
     new_table.count = 0;
     new_table.entries = calloc(new_size, sizeof(Entry *));
