@@ -8,6 +8,7 @@
 #define PRIME 151
 #define BASE_SIZE 32
 
+static Entry DELETED_ENTRY = {.key = NULL, .value = 0};
 void initTable(Table *table)
 {
 
@@ -30,15 +31,15 @@ void freeTable(Table *table)
 {
     for (int i = 0; i < table->capacity; i++)
     {
-        if (table->entries[i]!= &DELETED_ENTRY){
+        if (table->entries[i] != &DELETED_ENTRY)
+        {
 
-        free(table->entries[i]);
+            free(table->entries[i]);
         }
     }
     free(table->entries);
     initTable(table);
 }
-static Entry DELETED_ENTRY = {.key = NULL, .value = 0};
 Entry *lookUp(Table *table, StringObj *key) // returns the index
 {
     int capacity = table->capacity;
@@ -49,7 +50,7 @@ Entry *lookUp(Table *table, StringObj *key) // returns the index
     {
         char *entry_key = current->key->chars;
 
-        if (strlen(entry_key) == strlen(key) && strcmp(key, entry_key) == 0 && current != &DELETED_ENTRY)
+        if (strlen(entry_key) == strlen(key->chars) && strcmp(key->chars, entry_key) == 0 && current != &DELETED_ENTRY)
         {
             return current;
         } // compare key from the current entry to the one as a parameter
@@ -68,7 +69,7 @@ static int get_index(Table *table, StringObj *key)
 
     while (current != NULL)
     {
-        if (strlen(current->key->chars) && strcmp(key, current->key->chars) == 0 && current != &DELETED_ENTRY)
+        if (strlen(current->key->chars) && strcmp(key->chars, current->key->chars) == 0 && current != &DELETED_ENTRY)
         {
             return index;
         }
@@ -80,18 +81,20 @@ static void growTable(Table *table, int new_size)
 {
     if (new_size < BASE_SIZE)
     {
-        return table;
+        return;
     }
     Table *new_table = malloc(sizeof(Table));
     new_table->capacity = new_size;
     new_table->count = 0;
     new_table->entries = calloc(new_size, sizeof(Entry));
-    for (int i = 0; i < table->capacity; i++){
-        if(table->entries[i] != NULL && table->entries[i] != &DELETED_ENTRY){
-            set(new_table, table->entries[i]->value, table->entries[i]->key );
+    for (int i = 0; i < table->capacity; i++)
+    {
+        if (table->entries[i] != NULL && table->entries[i] != &DELETED_ENTRY)
+        {
+            set(new_table, table->entries[i]->value, table->entries[i]->key);
         }
     }
-    Table * temp_table = table;
+    Table *temp_table = table;
     freeTable(temp_table);
 
     table = new_table;
@@ -120,12 +123,16 @@ bool set(Table *table, Value value, StringObj *key)
         init_index++;
     }
     table->entries[init_index] = new_entry;
-    table->count ++;
+    table->count++;
     return true;
 }
 bool delete_entry(Table *table, StringObj *key)
 {
     int index = get_index(table, key);
+    if (index < 0)
+    {
+        return false;
+    }
     Entry *temp_ptr = table->entries[index];
     free(temp_ptr);
     table->entries[index] = &(DELETED_ENTRY);
@@ -133,6 +140,7 @@ bool delete_entry(Table *table, StringObj *key)
     // NOW RESIZE DOWN IF COUNT IS SMALLER THAN 10%
     if ((table->count / table->capacity) < 0.1)
     {
-        growTable(table, table->capacity/2);
+        growTable(table, table->capacity / 2);
     }
+    return true;
 }
