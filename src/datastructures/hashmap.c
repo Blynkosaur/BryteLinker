@@ -46,21 +46,21 @@ Entry *lookUp(Table *table, StringObj *key) // returns the index
     char *string_key = key->chars;
     uint32_t hash = (key->hash) % capacity;
     Entry *current = (table->entries)[hash];
-    while (current != NULL)
+    for (int i = 0; i < table->capacity; i++)
     {
-        char *entry_key = current->key->chars;
-
-        if (strlen(entry_key) == strlen(key->chars) && strcmp(key->chars, entry_key) == 0 && current != &DELETED_ENTRY)
+        int index = (hash + i) % table->capacity;
+        Entry *current = table->entries[index];
+        if (current == NULL)
+        {
+            return NULL;
+        }
+        if (current != &DELETED_ENTRY &&
+            strcmp(current->key->chars, key->chars) == 0)
         {
             return current;
-        } // compare key from the current entry to the one as a parameter
-        else
-        {
-            current++;
         }
     }
-    return NULL;
-}
+    }
 static int get_index(Table *table, StringObj *key)
 {
     uint32_t init_hash = key->hash % (table->capacity);
@@ -86,7 +86,7 @@ static void growTable(Table *table, int new_size)
     Table *new_table = malloc(sizeof(Table));
     new_table->capacity = new_size;
     new_table->count = 0;
-    new_table->entries = calloc(new_size, sizeof(Entry));
+    new_table->entries = calloc(new_size, sizeof(Entry *));
     for (int i = 0; i < table->capacity; i++)
     {
         if (table->entries[i] != NULL && table->entries[i] != &DELETED_ENTRY)

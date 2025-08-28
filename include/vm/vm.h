@@ -2,6 +2,7 @@
 #define bryte_vm_h
 #include "../bytecode/chunk.h"
 #include "../../include/bytecode/value.h"
+#include "../datastructures/hashmap.h"
 #define STACK_MAX 256
 typedef struct{
     Chunk*chunk;
@@ -9,6 +10,7 @@ typedef struct{
     Value stack[STACK_MAX];
     Value *stackTop;
     Obj* objectsHead;
+    Table strings;
 
 }VM;
 

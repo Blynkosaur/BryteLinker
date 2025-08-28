@@ -205,6 +205,7 @@ void initVM()
 {   
     vm.objectsHead = NULL;
     resetStack();
+    initTable(&vm.strings);
 }
 
 void push(Value value)
@@ -221,6 +222,7 @@ Value pop()
 void freeVM()
 {
     freeObjects();
+    freeTable(&vm.strings);
 }
 // typedef struct{
 //     Chunk*chunk;

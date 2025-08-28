@@ -23,6 +23,7 @@ static StringObj *allocateString(char *chars, int length, uint32_t hash)
     string->chars = chars;
     string->length = length;
     string->hash = hash;
+    set(&vm.strings,NULL_VAL, string);
     return string;
 }
 
