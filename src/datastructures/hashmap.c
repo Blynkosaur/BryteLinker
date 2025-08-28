@@ -60,6 +60,7 @@ Entry *lookUp(Table *table, StringObj *key) // returns the index
             return current;
         }
     }
+    return NULL;
     }
 static int get_index(Table *table, StringObj *key)
 {
@@ -79,6 +80,7 @@ for (int i = 0; i < table->capacity; i++)
         {
             return index;
         }
+        return -1;
     }
     // while (current != NULL)
     // {
