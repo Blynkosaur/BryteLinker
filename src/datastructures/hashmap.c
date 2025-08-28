@@ -31,7 +31,7 @@ void freeTable(Table *table)
     free(table->entries);
     initTable(table);
 }
-
+static Entry DELETED_ENTRY = {.key = NULL, .value = 0};
 static Entry*lookUp(Table *table, StringObj *key)//returns the index
 {
     int capacity = table ->capacity;
@@ -62,9 +62,20 @@ static int get_index(Table* table, StringObj* key){
         if(strlen(current->key->chars)&& strcmp(key,current->key->chars)==0){
             return index;
         }
-    index ++;
+        index ++;
     }
     return -1;
+}
+void growTable(Table* table, int new_size){
+    if (new_size < BASE_SIZE){
+        return table;
+    }
+    Table * new_table = malloc(sizeof(Table));
+    new_table -> capacity = new_size;
+    new_table -> count = 0;
+    new_table -> entries = calloc(new_size, sizeof(Entry));
+    
+    return new_table;
 }
 bool set(Table *table, Value value, StringObj *key)
 {
@@ -82,5 +93,12 @@ while ((table->entries)[init_index]!= NULL){
     init_index++;
 }
 table->entries[init_index] = new_entry;
+}
+bool delete(Table* table, StringObj * key){
+    int index = get_index(table, key );
+    Entry* temp_ptr = table-> entries[index];
+    free(temp_ptr);
+    table -> entries[index] = &(DELETED_ENTRY);
+    // NOW RESIZE DOWN IF COUNT IS SMALLER THAN 10%
 }
 
