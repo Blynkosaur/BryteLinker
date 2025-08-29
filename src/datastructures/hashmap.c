@@ -118,6 +118,9 @@ static void growTable(Table *table, int new_size)
 
 bool set(Table *table, Value value, StringObj *key)
 {
+    if(table->capacity == 0){
+        growTable(table, BASE_SIZE);
+    }
     Entry *lookup = lookUp(table, key);
     if (lookup != NULL)
     { // just changing the value that's already there
@@ -136,7 +139,7 @@ bool set(Table *table, Value value, StringObj *key)
 
     while ((table->entries)[init_index] != NULL)
     {
-        init_index++;
+        init_index = (init_index+1)%table->capacity;
     }
     table->entries[init_index] = new_entry;
     table->count++;

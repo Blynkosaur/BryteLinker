@@ -20,10 +20,10 @@ all: $(LINK_TARGET)
 
 
 $(LINK_TARGET): $(TARGET_OBJS)
-	gcc -o $@ $^ $(CC_FLAG) $(OTHER_FLAGS)
+	gcc -o $@ $^ $(CC_FLAG) $(OTHER_FLAGS) -g
 
 build/%.o: %.c
-	gcc -o $@ -c $<
+	gcc -o $@ -c $< $(CC_FLAG) $(OTHER_FLAGS)
 # Automatic variables are set by make after a rule is matched. There include:
 # $@: the target filename.
 # $*: the target filename without the file extension.
