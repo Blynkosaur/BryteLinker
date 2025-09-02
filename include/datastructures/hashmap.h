@@ -21,7 +21,7 @@ typedef struct {
 void initTable(Table* table);
 void freeTable(Table* table);
 bool set(Table* table, Value value, StringObj* key );
-Entry* lookUp(Table* table, StringObj* key);
+Entry* lookUp(Table* table, char* key, uint32_t hash);
 
 
 bool delete_entry(Table *table, StringObj *key);

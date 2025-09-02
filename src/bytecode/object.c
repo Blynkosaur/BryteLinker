@@ -43,6 +43,11 @@ StringObj *copyString(const char *chars, int length)
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
     uint32_t hash = hashFunc(chars, length);
+    Entry* interned = lookUp(&vm.strings, chars, hash );
+    if (interned != NULL){
+        return interned->key;
+    }
+    
     return allocateString(heapChars, length, hash);
 }
 

@@ -40,12 +40,12 @@ void freeTable(Table *table)
     free(table->entries);
     initTable(table);
 }
-Entry *lookUp(Table *table, StringObj *key) // returns the index
+Entry *lookUp(Table *table, char*key,  uint32_t hash) // returns the index
 {
     int capacity = table->capacity;
-    char *string_key = key->chars;
-    uint32_t hash = (key->hash) % capacity;
-    Entry *current = (table->entries)[hash];
+    char *string_key = key;
+    uint32_t init_hash = (hash) % capacity;
+    Entry *current = (table->entries)[init_hash];
     for (int i = 0; i < table->capacity; i++)
     {
         int index = (hash + i) % table->capacity;
@@ -55,7 +55,7 @@ Entry *lookUp(Table *table, StringObj *key) // returns the index
             return NULL;
         }
         if (current != &DELETED_ENTRY &&
-            strcmp(current->key->chars, key->chars) == 0)
+            strcmp(current->key->chars, key) == 0)
         {
             return current;
         }
@@ -121,7 +121,7 @@ bool set(Table *table, Value value, StringObj *key)
     if(table->capacity == 0){
         growTable(table, BASE_SIZE);
     }
-    Entry *lookup = lookUp(table, key);
+    Entry *lookup = lookUp(table, key->chars, key->hash);
     if (lookup != NULL)
     { // just changing the value that's already there
         lookup->value = value;
