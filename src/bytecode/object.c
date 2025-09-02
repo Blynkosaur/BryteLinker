@@ -5,6 +5,7 @@
 #include "../../include/bytecode/object.h"
 #include "../../include/bytecode/value.h"
 #include "../../include/vm/vm.h"
+#include "../../include/datastructures/hashmap.h"
 
 // #define ALLOCATE_OBJ(type, objectType) ((type*) allocateObject(sizeof(type), objectType))
 
@@ -39,14 +40,16 @@ static uint32_t hashFunc(const char* key, int length){
 
 StringObj *copyString(const char *chars, int length)
 {
-    char *heapChars = malloc(sizeof(char) * length + 1);
-    memcpy(heapChars, chars, length);
-    heapChars[length] = '\0';
+
     uint32_t hash = hashFunc(chars, length);
-    Entry* interned = lookUp(&vm.strings, chars, hash );
+Entry* interned = lookUp(&vm.strings, chars, hash, length );
     if (interned != NULL){
         return interned->key;
     }
+    char *heapChars = malloc(sizeof(char) * length + 1);
+    memcpy(heapChars, chars, length);
+    heapChars[length] = '\0';
+    
     
     return allocateString(heapChars, length, hash);
 }
@@ -63,5 +66,11 @@ void printObject(Value value)
 StringObj *makeObjWithString(char *chars, int length)
 {
     uint32_t hash = hashFunc(chars,length);
+    
+    Entry* interned = lookUp(&vm.strings, chars, hash, length);
+    if(interned != NULL){
+       free(chars);
+       return interned->key;
+    }
     return allocateString(chars, length, hash);
 }
