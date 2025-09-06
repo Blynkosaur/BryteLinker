@@ -171,7 +171,7 @@ static InterpretResult run()
         }
 #ifdef DEBUG_TRACE_EXECUTION
         printf("\n         ");
-
+        printf("VM stack:");
         for (Value *slot = vm.stack; slot < vm.stackTop; slot++)
         {
             printf("[ ");
@@ -179,6 +179,21 @@ static InterpretResult run()
             printf(" ]");
         }
         printf("\n\n");
+        printf("VM table: ");
+        if ((&vm.strings)->entries == NULL || (&vm.strings)->capacity == 0) {
+        printf("Table is empty\n");
+        continue;   
+    }
+    
+    Entry** entries = vm.strings.entries;
+    for (int i = 0; i < vm.strings.capacity; i++){
+        if(entries[i] != NULL && entries[i]->key != NULL){
+            printf("[ ");
+            printf("%s %p %p", entries[i]->key->chars, entries[i]->key, entries[i] );
+            printf(" ]");
+        }
+    }
+    printf("\n");
 #endif
     }
 #undef READ_BYTE

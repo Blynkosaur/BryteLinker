@@ -44,8 +44,10 @@ StringObj *copyString(const char *chars, int length)
     uint32_t hash = hashFunc(chars, length);
 Entry* interned = lookUp(&vm.strings, chars, hash, length );
     if (interned != NULL){
+        printf("interned found from copystring at %p\n", interned);
         return interned->key;
     }
+    printf("nothing found at copyString\n");
     char *heapChars = malloc(sizeof(char) * length + 1);
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
@@ -70,7 +72,10 @@ StringObj *makeObjWithString(char *chars, int length)
     Entry* interned = lookUp(&vm.strings, chars, hash, length);
     if(interned != NULL){
        free(chars);
+
+        printf("interned found from makeObjWithString at %p\n", interned);
        return interned->key;
     }
+printf("nothing found at makeObjWithString\n");
     return allocateString(chars, length, hash);
 }

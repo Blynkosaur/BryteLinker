@@ -42,6 +42,9 @@ void freeTable(Table *table)
 }
 Entry *lookUp(Table *table, char*key,  uint32_t hash, int length) // returns the index
 {
+    if (table->capacity == 0){
+        return NULL;
+    }
     int capacity = table->capacity;
     char *string_key = key;
     uint32_t init_hash = (hash) % capacity;
