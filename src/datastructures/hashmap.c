@@ -58,7 +58,7 @@ Entry *lookUp(Table *table, char*key,  uint32_t hash, int length) // returns the
             return NULL;
         }
         if (current != &DELETED_ENTRY &&
-            strcmp(current->key->chars, key) == 0 && strlen(current->key->chars) == length)
+            strncmp(current->key->chars, key, length) == 0 && strlen(current->key->chars) == length)
         {
             return current;
         }

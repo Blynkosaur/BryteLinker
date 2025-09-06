@@ -42,6 +42,8 @@ StringObj *copyString(const char *chars, int length)
 {
 
     uint32_t hash = hashFunc(chars, length);
+
+    printf("lookup from copyString with %s\n", chars); 
 Entry* interned = lookUp(&vm.strings, chars, hash, length );
     if (interned != NULL){
         printf("interned found from copystring at %p\n", interned);
@@ -68,7 +70,7 @@ void printObject(Value value)
 StringObj *makeObjWithString(char *chars, int length)
 {
     uint32_t hash = hashFunc(chars,length);
-    
+    printf("lookup from makeojb with %s\n", chars); 
     Entry* interned = lookUp(&vm.strings, chars, hash, length);
     if(interned != NULL){
        free(chars);

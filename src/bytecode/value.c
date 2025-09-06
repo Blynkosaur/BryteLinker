@@ -44,9 +44,10 @@ bool isEqual(Value a, Value b){
         case VAL_NUMBER: return PAYLOAD_NUMBER(a) == PAYLOAD_NUMBER(b);
         
         case VAL_OBJ:{
-            StringObj* aString = PAYLOAD_STRING(a);
-            StringObj* bString = PAYLOAD_STRING(b);
-            return aString->length == bString->length && strcmp(aString->chars,bString->chars)==0 ;
+            // StringObj* aString = PAYLOAD_STRING(a);
+            // StringObj* bString = PAYLOAD_STRING(b);
+            // return aString->length == bString->length && strcmp(aString->chars,bString->chars)==0 ;
+            return PAYLOAD_OBJ(a) == PAYLOAD_OBJ(b);
 
         }
 
