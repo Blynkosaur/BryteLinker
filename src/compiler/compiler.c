@@ -45,6 +45,8 @@ typedef struct
 }ParseRule;
 
 static void expression();
+static void statement();
+static void declaration();
 static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 static void advance();
@@ -131,6 +133,20 @@ static void expression()
 {
     parsePrecedence(PREC_ASSIGNMENT);
 }
+static void printStatement(){
+    expression();
+    consume(TOKEN_SEMICOLON,"Expect ';' after value.");
+    writeByte(OP_PRINT);
+
+}
+static void declaration(){
+    statement();
+}
+static void statement(){
+    if(match(TOKEN_PRINT)){
+        printStatement();
+    }
+}
 static void consume(TokenType type, const char *message)
 {
     if (parser.current.type == type)
@@ -139,6 +155,14 @@ static void consume(TokenType type, const char *message)
         return;
     }
     errorAtCurrent(message);
+}
+static bool match(TokenType type){
+    if(!check(type)) return false;
+    advance();
+    return true;
+}
+static bool check(TokenType type){
+   return parser.current.type == type; 
 }
 
 static void writeByte(uint8_t byte)
@@ -311,9 +335,11 @@ bool compile(const char *source, Chunk *chunk)
     parser.hadError = false;
     parser.hadError = false;
     advance();
-    expression();
-    consume(TOKEN_EOF, "Expected end of expression.");
-    endCompiler();
+    while (!match(TOKEN_EOF)){
+        decalration();
+    }
+        endCompiler();
+        
     #ifdef DEBUG_PRINT_CODE
     #include "../../include/debug.h"
     if(!parser.hadError){

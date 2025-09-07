@@ -162,6 +162,12 @@ static InterpretResult run()
             push(new);
             break;
         }
+        case OP_PRINT:
+        {
+            printValue(pop());
+            printf("\n");
+            break;
+        }
         case OP_RETURN:
         {
             printValue(pop());
