@@ -71,6 +71,8 @@ static InterpretResult run()
     for (;;)
     {
 #ifdef DEBUG_TRACE_EXECUTION // only for debugging
+        printf("vm.ip: %p\n",vm.ip);
+        printf("vm.chunk->code: %p, offset: %d", vm.chunk->code, vm.ip-vm.chunk->code);
         disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
 
 #endif
@@ -170,8 +172,8 @@ static InterpretResult run()
         }
         case OP_RETURN:
         {
-            printValue(pop());
-            printf("\n");
+            // printValue(pop());
+            // printf("\n");
             return INTERPRET_OK;
         }
         }
@@ -208,17 +210,18 @@ static InterpretResult run()
 }
 InterpretResult interpret(const char *source)
 {
-    Chunk chunk;
-    initChunk(&chunk);
-    if (!compile(source, &chunk))
+    Chunk* chunk = malloc(sizeof(Chunk));
+    initChunk(chunk);
+    if (!compile(source, chunk))
     {
         freeChunk(&chunk);
         return INTERPRET_COMPILE_ERROR;
     }
-    vm.chunk = &chunk;
+    vm.chunk = chunk;
     vm.ip = vm.chunk->code;
     InterpretResult result = run();
-    freeChunk(&chunk);
+    freeChunk(chunk);
+    free(chunk);
     return result;
 }
 

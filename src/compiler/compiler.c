@@ -47,8 +47,11 @@ typedef struct
 static void expression();
 static void statement();
 static void declaration();
+static bool check(TokenType type);
 static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
+static bool match(TokenType type);
+static void consume(TokenType type, const char *message);
 static void advance();
 static void error(const char *message);
 static void writeByte(uint8_t byte);
@@ -336,7 +339,7 @@ bool compile(const char *source, Chunk *chunk)
     parser.hadError = false;
     advance();
     while (!match(TOKEN_EOF)){
-        decalration();
+        declaration();
     }
         endCompiler();
         
