@@ -181,6 +181,19 @@ static InterpretResult run()
         break; 
 
        } 
+       case OP_GET_GLOBAL:
+       {
+        StringObj* name = READ_STRING();
+        Entry* lookup = lookUp(&vm.globals,name->chars, name->hash, name->length);
+        if (lookup == NULL){
+
+            runtimeError("Undefined variable '%s'.", name->chars);
+            return INTERPRET_RUNTIME_ERROR;
+        }
+        push(lookup->value);
+        break;
+
+       }
         case OP_RETURN:
         {
             // printValue(pop());

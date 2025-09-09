@@ -57,6 +57,7 @@ static void advance();
 static void error(const char *message);
 static void writeByte(uint8_t byte);
 
+static void writeBytes(uint8_t byte1, uint8_t byte2);
 static void parsePrecedence(Precedence precedence){
     advance();
     Parsefunc prefixRule = getRule(parser.previous.type)->prefix;
@@ -138,19 +139,19 @@ static void expression()
     parsePrecedence(PREC_ASSIGNMENT);
 }
 static uint8_t identifierConstant(Token* token){
-       return makeConstant(OBJ_VAL(copyString(token->start,token->length))); 
+       return makeConstant(OBJ_VAL(copyString(token->start,token->length))); // stores the variable name to the chunk value array
 }
 static void defineVariable(uint8_t global){
-    writeBytes(OP_DEFINE_GLOBAL, global);
+    writeBytes(OP_DEFINE_GLOBAL, global);// OP_DEFINE_GLOBAL
 }
-static uint8_t parseVariable(const char* errorMessage){
+static uint8_t parseVariable(const char* errorMessage){ //stores the variable name
        consume(TOKEN_IDENTIFIER, errorMessage);
-        return identifierConstant(&parser.previous);
+        return identifierConstant(&parser.previous);//returns the index of the of the variable name on the value array
 }
 static void varDeclaration(){
-    uint8_t global = parseVariable("Expected variable name");
+    uint8_t global = parseVariable("Expected variable name");//index of name on value array
     if (match(TOKEN_EQUAL)){
-        expression();
+        expression();//stores the variable value
     }
     else{
         writeByte(OP_NULL);
