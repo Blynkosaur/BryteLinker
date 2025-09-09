@@ -11,6 +11,7 @@ typedef struct{
     Value *stackTop;
     Obj* objectsHead;
     Table strings;
+    Table globals;// for global variables
 
 }VM;
 

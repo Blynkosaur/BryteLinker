@@ -55,6 +55,7 @@ static InterpretResult run()
 {
 #define READ_BYTE() (*vm.ip++) // dereferences vm.ip (index pointer) and moves the pointer more
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
+#define READ_STRING() PAYLOAD_STRING(READ_CONSTANT())
 #define BINARY_OP(valueType, op)                          \
     do                                                    \
     {                                                     \
@@ -174,7 +175,11 @@ static InterpretResult run()
         }
         case OP_DEFINE_GLOBAL:
        {
-        
+        StringObj* name = READ_STRING();
+        set(&vm.globals, peek(0), name);
+        pop();
+        break; 
+
        } 
         case OP_RETURN:
         {
@@ -211,6 +216,7 @@ static InterpretResult run()
 #endif
     }
 #undef READ_BYTE
+#undef READ_STRING
 #undef READ_CONSTANT
 #undef BINARY_OP
 }
@@ -236,6 +242,7 @@ void initVM()
     vm.objectsHead = NULL;
     resetStack();
     initTable(&vm.strings);
+    initTable(&vm.globals);
 }
 
 void push(Value value)
@@ -253,6 +260,7 @@ void freeVM()
 {
     freeObjects();
     freeTable(&vm.strings);
+    freeTable(&vm.globals);
 }
 // typedef struct{
 //     Chunk*chunk;
