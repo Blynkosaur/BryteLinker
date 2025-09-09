@@ -50,6 +50,7 @@ static void declaration();
 static bool check(TokenType type);
 static ParseRule* getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
+static u_int8_t makeConstant(Value value);
 static bool match(TokenType type);
 static void consume(TokenType type, const char *message);
 static void advance();
@@ -136,6 +137,28 @@ static void expression()
 {
     parsePrecedence(PREC_ASSIGNMENT);
 }
+static uint8_t identifierConstant(Token* token){
+       return makeConstant(OBJ_VAL(copyString(token->start,token->length))); 
+}
+static void defineVariable(uint8_t global){
+    writeBytes(OP_DEFINE_GLOBAL, global);
+}
+static uint8_t parseVariable(const char* errorMessage){
+       consume(TOKEN_IDENTIFIER, errorMessage);
+        return identifierConstant(&parser.previous);
+}
+static void varDeclaration(){
+    uint8_t global = parseVariable("Expected variable name");
+    if (match(TOKEN_EQUAL)){
+        expression();
+    }
+    else{
+        writeByte(OP_NULL);
+    }//allows simple variable declaration or declaration with assignment
+    consume(TOKEN_SEMICOLON, "Expected ';' after variable declaration");
+
+    defineVariable(global);
+}
 static void expressionStatement(){
     expression();
     consume(TOKEN_SEMICOLON, "Expect ';' after expression.");
@@ -152,6 +175,7 @@ static void synchronize(){
     while (parser.current.type!= TOKEN_EOF){
         if (parser.previous.type == TOKEN_SEMICOLON) return;
         switch(parser.current.type){
+            //basically safe to start scanning at the beginning of a statement
             case TOKEN_PRINT:
             case TOKEN_CLASS:
             case TOKEN_VAR:
@@ -163,14 +187,18 @@ static void synchronize(){
             return;
             
             default: ;
-            
+
         }
     }
 
 }
 static void declaration(){
+    if (match(TOKEN_VAR)){
+        varDeclaration();
+    }else{
 
     statement();
+    }
     if (parser.cooked) synchronize();
 }
 static void statement(){

@@ -167,11 +167,15 @@ static InterpretResult run()
         }
         case OP_PRINT:
         {
-            print("Printed: ");
+            printf("Printed: ");
             printValue(pop());
             printf("\n");
             break;
         }
+        case OP_DEFINE_GLOBAL:
+       {
+        
+       } 
         case OP_RETURN:
         {
             // printValue(pop());
