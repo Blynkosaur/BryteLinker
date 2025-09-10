@@ -345,7 +345,12 @@ static void string(){
 }
 static void namedVariable(Token name){
     uint8_t arg = identifierConstant(&name);
-    writeBytes(OP_GET_GLOBAL, arg);  
+    if(match(TOKEN_EQUAL)){
+        expression();
+        writeBytes(OP_SET_GLOBAL,arg);
+    }else{
+        writeBytes(OP_GET_GLOBAL, arg);
+    }
 }
 static void variable(){
     namedVariable(parser.previous);

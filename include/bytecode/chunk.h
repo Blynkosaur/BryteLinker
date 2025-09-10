@@ -19,6 +19,7 @@ typedef enum {
     OP_MULITPLY,
     OP_DIVIDE,
     OP_GET_GLOBAL,
+    OP_SET_GLOBAL,
     OP_NEGATE,
     OP_NOT,
     OP_PRINT,
