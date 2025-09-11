@@ -350,7 +350,7 @@ static void string(bool canAssign){
 }
 static void namedVariable(Token name, bool canAssign){
     uint8_t arg = identifierConstant(&name);
-    if(match(TOKEN_EQUAL && canAssign)){
+    if(match(TOKEN_EQUAL)&& canAssign ){
         expression();
         writeBytes(OP_SET_GLOBAL,arg);
     }else{
