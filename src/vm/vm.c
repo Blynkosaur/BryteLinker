@@ -71,6 +71,7 @@ static InterpretResult run()
     printf("\n-----INTERPRETING-----\n\n");
     for (;;)
     {
+        
 #ifdef DEBUG_TRACE_EXECUTION // only for debugging
         printf("vm.ip: %p\n",vm.ip);
         printf("vm.chunk->code: %p, offset: %d", vm.chunk->code, vm.ip-vm.chunk->code);
@@ -252,7 +253,7 @@ InterpretResult interpret(const char *source)
     initChunk(chunk);
     if (!compile(source, chunk))
     {
-        freeChunk(&chunk);
+        freeChunk(chunk);
         return INTERPRET_COMPILE_ERROR;
     }
     vm.chunk = chunk;

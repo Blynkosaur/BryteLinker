@@ -32,6 +32,7 @@ typedef struct{
     int* lines;
     ValueArray constants;
     uint8_t* code;
+    bool cooked;
 } Chunk;
 
 void initChunk(Chunk* chunk);
