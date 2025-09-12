@@ -51,6 +51,9 @@ Entry* interned = lookUp(&vm.strings, chars, hash, length );
     }
     printf("nothing found at copyString\n");
     char *heapChars = malloc(sizeof(char) * length + 1);
+    if(heapChars == NULL){
+        printf("NULL pointer, nothing allocated \n");
+    }
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
     

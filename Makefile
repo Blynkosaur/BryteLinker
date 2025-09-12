@@ -15,12 +15,15 @@ vpath %.h include include/bytecode include/vm include/compiler include/datastruc
 
 build:
 	mkdir -p build
-all: $(LINK_TARGET)
+all: $(LINK_TARGET) 
 	echo All done
 
 
-$(LINK_TARGET): $(TARGET_OBJS)
+$(LINK_TARGET): $(TARGET_OBJS) 
 	gcc -o $@ $^ $(CC_FLAG) $(OTHER_FLAGS) -g
+	codesign -s - -f --entitlements build/segv.entitlements build/main 
+build/segv.entitlements:
+        /usr/libexec/PlistBuddy -c "Add :com.apple.security.get-task-allow bool true" $@ 
 
 build/%.o: %.c
 	gcc -o $@ -c $< $(CC_FLAG) $(OTHER_FLAGS)

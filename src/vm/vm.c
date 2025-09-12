@@ -254,6 +254,9 @@ InterpretResult interpret(const char *source)
     if (!compile(source, chunk))
     {
         freeChunk(chunk);
+        printf("INTERPRET_COMPILE_ERROR\n");
+        freeChunk(chunk);
+        free(chunk);
         return INTERPRET_COMPILE_ERROR;
     }
     vm.chunk = chunk;
