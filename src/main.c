@@ -10,7 +10,7 @@ static void repl(){ //REPL read eval print loop when you just run >>python and p
     // in that weird ass environment
     char line[1024];
     while(1){
-        printf("> ");
+        printf(">>> ");
         if(!fgets(line, sizeof(line), stdin) ){
             printf("\n");
             
