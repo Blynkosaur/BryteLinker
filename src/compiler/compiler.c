@@ -19,7 +19,6 @@ static Chunk *currentChunk()
 }
 
 Parser parser;
-Compiler* current = NULL;
 
 typedef enum
 {
@@ -54,6 +53,7 @@ typedef struct{
     
 }Compiler;
 
+Compiler* current = NULL;
 static void expression();
 static void statement();
 static void declaration();
@@ -172,13 +172,33 @@ static uint8_t identifierConstant(Token *token)
 {
     return makeConstant(OBJ_VAL(copyString(token->start, token->length))); // stores the variable name to the chunk value array
 }
+static void addLocal(Token name){
+    if(current->localCount == UINT8_COUNT){
+        error("Too many local variables in function.");
+        return;
+    }
+    Local * local = &current -> locals[current->localCount++];
+    local->name = name;
+    local -> depth = current->scopeDepth;
+}
+
+static void delcareVariable(){
+    if(current->scopeDepth == 0) return;
+    Token* name = &parser.previous;
+    addLocal(*name);
+}
 static void defineVariable(uint8_t global)
 {
+    if(current->scopeDepth>0){
+        return;
+    }
     writeBytes(OP_DEFINE_GLOBAL, global); // OP_DEFINE_GLOBAL
 }
 static uint8_t parseVariable(const char *errorMessage)
 { // stores the variable name
     consume(TOKEN_IDENTIFIER, errorMessage);
+    declareVariable();
+    if(current->scopeDepth>0) return 0;
     return identifierConstant(&parser.previous); // returns the index of the of the variable name on the value array
 }
 static void varDeclaration()
