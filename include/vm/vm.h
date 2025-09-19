@@ -10,7 +10,7 @@ typedef struct{
     Value stack[STACK_MAX];
     Value *stackTop;
     Obj* objectsHead;
-    Table strings;
+    Table strings;// for string objects to be interned
     Table globals;// for global variables
 
 }VM;
