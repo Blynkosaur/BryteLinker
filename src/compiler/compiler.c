@@ -1,6 +1,7 @@
 #include "../../include/compiler/compiler.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "../../include/compiler/scanner.h"
 
 typedef struct
@@ -172,6 +173,10 @@ static uint8_t identifierConstant(Token *token)
 {
     return makeConstant(OBJ_VAL(copyString(token->start, token->length))); // stores the variable name to the chunk value array
 }
+static bool identifierEquals(Token* a, Token *b){
+    if(a->length != b->length) return false;
+    return strncmp(a->start, b->start, a->length) == 0; 
+}
 static void addLocal(Token name){
     if(current->localCount == UINT8_COUNT){
         error("Too many local variables in function.");
@@ -185,7 +190,17 @@ static void addLocal(Token name){
 static void delcareVariable(){
     if(current->scopeDepth == 0) return;
     Token* name = &parser.previous;
+    for (int i = current->localCount -1; i>=0; i--){
+        Local* local = &current->locals[i];
+        if(local->depth!= -1 && local->depth < current->scopeDepth){
+            break;
+        }
+        if(identifiersEqual(name, &local->name)){
+            error("variable already declared/existing in this scope");
+        }
+    }
     addLocal(*name);
+
 }
 static void defineVariable(uint8_t global)
 {
