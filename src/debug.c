@@ -2,6 +2,7 @@
 #include "../include/debug.h"
 
 
+static int byteInstruction(const char* name, Chunk* chunk, int offset);
 static int simpleInstruction(const char*, int);
 static int constantInstruction (const char* name, Chunk* chunk, int offset);
 void disassembleChunk(Chunk*chunk, const char *name){
@@ -62,6 +63,11 @@ int disassembleInstruction (Chunk*chunk, int offset){
             return simpleInstruction("OP_GREATER", offset);
         case OP_LESS:
             return simpleInstruction("OP_LESS", offset);
+        case OP_GET_LOCAL:
+            return byteInstruction("OP_GET_LOCAL", chunk, offset);
+        case OP_SET_LOCAL:
+            return byteIntruction("OP_SET_LOCAL", chunk, offset);
+
 
         
         default:
@@ -72,6 +78,11 @@ int disassembleInstruction (Chunk*chunk, int offset){
 static int simpleInstruction(const char* name, int offset){
     printf("%s\n", name);
     return offset +1;
+}
+static int byteInstruction(const char* name, Chunk* chunk, int offset){
+    uint8_t slot = chunk -> code[offset+1];
+    printf("%16s %4d\n", name, slot);
+    return offset +2;
 }
 
 static int constantInstruction (const char* name, Chunk* chunk, int offset){

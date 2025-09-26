@@ -176,6 +176,19 @@ static uint8_t identifierConstant(Token *token)
 static bool identifierEquals(Token* a, Token *b){
     if(a->length != b->length) return false;
     return strncmp(a->start, b->start, a->length) == 0; 
+
+}
+static int resolveLocal(Compiler* compiler, Token* name){
+    for (int i = compiler->localCount-1;i >= 0; i--){
+        Local* local = &compiler -> locals[i];
+        if(identfiersEquals(name, &local->name)){
+            if (local->depth ==-1){
+                error("Can't read local variable in its own initializer");
+            }
+            return i;
+        }
+    }
+    return -1;
 }
 static void addLocal(Token name){
     if(current->localCount == UINT8_COUNT){
@@ -184,7 +197,7 @@ static void addLocal(Token name){
     }
     Local * local = &current -> locals[current->localCount++];
     local->name = name;
-    local -> depth = current->scopeDepth;
+    local -> depth = -1;
 }
 
 static void delcareVariable(){
@@ -205,16 +218,21 @@ static void delcareVariable(){
 static void defineVariable(uint8_t global)
 {
     if(current->scopeDepth>0){
+        markInitialized();
         return;
     }
     writeBytes(OP_DEFINE_GLOBAL, global); // OP_DEFINE_GLOBAL
 }
+
 static uint8_t parseVariable(const char *errorMessage)
 { // stores the variable name
     consume(TOKEN_IDENTIFIER, errorMessage);
     declareVariable();
     if(current->scopeDepth>0) return 0;
     return identifierConstant(&parser.previous); // returns the index of the of the variable name on the value array
+}
+static void markInitialized(){
+    current->locals[current->localCount-1].depth = current->scopeDepth;
 }
 static void varDeclaration()
 {
@@ -363,6 +381,10 @@ static void beginScope(){
 }
 static void endScope(){
     current->scopeDepth--;
+    while(current->localCount > 0 && current -> locals[current->localCount-1].depth > current -> scopeDepth){
+        writeByte(OP_POP);
+        current->localCount--;
+    }
 }
 
 static void grouping(bool canAssign)
@@ -450,15 +472,26 @@ static void string(bool canAssign)
 }
 static void namedVariable(Token name, bool canAssign)
 {
-    uint8_t arg = identifierConstant(&name);
+    uint8_t getOp, setOp;
+    int arg = resolveLocal(current, &name);
+    if(arg != -1){
+        getOp = OP_GET_LOCAL;
+        setOp = OP_SET_LOCAL;
+    }else{
+        arg = identifierConstant(&name);
+        getOp = OP_GET_GLOBAL;
+        setOp = OP_SET_GLOBAL;
+    }
     if (match(TOKEN_EQUAL) && canAssign)
+
     {
         expression();
-        writeBytes(OP_SET_GLOBAL, arg);
+        writeBytes(setOp,(uint8_t)arg);
     }
     else
     {
-        writeBytes(OP_GET_GLOBAL, arg);
+
+        writeBytes(getOp, (uint8_t)arg);
     }
 }
 static void variable(bool canAssign)
