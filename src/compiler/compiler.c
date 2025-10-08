@@ -51,7 +51,7 @@ typedef struct{
     Local locals[UINT8_COUNT];
     int localCount;
     int scopeDepth;
-    
+   // local variables are stored in array "locals" 
 }Compiler;
 
 Compiler* current = NULL;
@@ -68,6 +68,10 @@ static void advance();
 static void error(const char *message);
 static void writeByte(uint8_t byte);
 
+static void markInitialized();
+static void endScope();
+static void beginScope();
+static bool identifierEquals(Token* a, Token *b);
 static void writeBytes(uint8_t byte1, uint8_t byte2);
 static void parsePrecedence(Precedence precedence)
 {
@@ -181,7 +185,7 @@ static bool identifierEquals(Token* a, Token *b){
 static int resolveLocal(Compiler* compiler, Token* name){
     for (int i = compiler->localCount-1;i >= 0; i--){
         Local* local = &compiler -> locals[i];
-        if(identfiersEquals(name, &local->name)){
+        if(identifierEquals(name, &local->name)){
             if (local->depth ==-1){
                 error("Can't read local variable in its own initializer");
             }
@@ -200,7 +204,7 @@ static void addLocal(Token name){
     local -> depth = -1;
 }
 
-static void delcareVariable(){
+static void declareVariable(){
     if(current->scopeDepth == 0) return;
     Token* name = &parser.previous;
     for (int i = current->localCount -1; i>=0; i--){
@@ -208,7 +212,7 @@ static void delcareVariable(){
         if(local->depth!= -1 && local->depth < current->scopeDepth){
             break;
         }
-        if(identifiersEqual(name, &local->name)){
+        if(identifierEquals(name, &local->name)){
             error("variable already declared/existing in this scope");
         }
     }
@@ -552,6 +556,8 @@ bool compile(const char *source, Chunk *chunk)
     parser.hadError = false;
     parser.hadError = false;
     advance();
+    Compiler compiler;
+    initCompiler(&compiler);
     while (!match(TOKEN_EOF))
     {
         if (parser.cooked){

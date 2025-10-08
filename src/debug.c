@@ -66,7 +66,7 @@ int disassembleInstruction (Chunk*chunk, int offset){
         case OP_GET_LOCAL:
             return byteInstruction("OP_GET_LOCAL", chunk, offset);
         case OP_SET_LOCAL:
-            return byteIntruction("OP_SET_LOCAL", chunk, offset);
+            return byteInstruction("OP_SET_LOCAL", chunk, offset);
 
 
         

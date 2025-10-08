@@ -21,7 +21,7 @@ all: $(LINK_TARGET)
 
 $(LINK_TARGET): $(TARGET_OBJS) 
 	gcc -o $@ $^ $(CC_FLAG) $(OTHER_FLAGS) -g
-	codesign -s - -f --entitlements build/segv.entitlements build/main 
+#codesign -s - -f --entitlements build/segv.entitlements build/main 
 build/segv.entitlements:
         /usr/libexec/PlistBuddy -c "Add :com.apple.security.get-task-allow bool true" $@ 
 
@@ -51,3 +51,4 @@ hashmap.c: object.h value.h memory.h hashmap.h
 
 
 #daily
+daily 2
