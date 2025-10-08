@@ -51,4 +51,3 @@ hashmap.c: object.h value.h memory.h hashmap.h
 
 
 #daily
-daily 2
