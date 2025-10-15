@@ -1,5 +1,6 @@
 #include "../../include/compiler/compiler.h"
 #include "../../include/compiler/scanner.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -325,6 +326,12 @@ static u_int8_t makeConstant(Value value) {
 static void writeBytes(uint8_t byte1, uint8_t byte2) {
   writeByte(byte1);
   writeByte(byte2);
+}
+static int writeJump(uint8_t instruction) {
+  writeByte(instruction);
+  writeByte(0xff);
+  writeByte(0xff);
+  return currentChunk()->count - 2;
 }
 
 static void writeConstant(Value value) {
