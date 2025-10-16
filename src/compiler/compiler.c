@@ -204,14 +204,12 @@ static void defineVariable(uint8_t global) {
   }
   writeBytes(OP_DEFINE_GLOBAL, global); // OP_DEFINE_GLOBAL
 }
-
 static void and_(bool canAssign) {
   int endJump = writeJump(OP_JUMP_IF_FALSE);
   writeByte(OP_POP);
   parsePrecedence(PREC_AND);
   patchJump(endJump);
 }
-
 static uint8_t
 parseVariable(const char *errorMessage) { // stores the variable name
   consume(TOKEN_IDENTIFIER, errorMessage);
@@ -247,14 +245,15 @@ static void ifStatement() {
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expect '(' after condition");
   int thenJump = writeJump(OP_JUMP_IF_FALSE);
-  writeByte(OP_POP);
-  statement();
-  int elseJump = writeJump(OP_JUMP);
+  writeByte(OP_POP);                 // pop bool of the condition if true
+  statement();                       // then clause
+  int elseJump = writeJump(OP_JUMP); // no need to worry bout conditional since
+                                     // included in the if statement
   patchJump(thenJump);
   if (match(TOKEN_ELSE))
     statement();
   patchJump(elseJump);
-  writeByte(OP_POP);
+  writeByte(OP_POP); // pop bool if false
 }
 static void printStatement() {
   expression();
@@ -267,7 +266,7 @@ static void synchronize() {
     if (parser.previous.type == TOKEN_SEMICOLON)
       return;
     switch (parser.current.type) {
-    // basically safe to start scanning at the beginning of a statement
+      // basically safe to start scanning at the beginning of a statement
     case TOKEN_PRINT:
     case TOKEN_CLASS:
     case TOKEN_VAR:
@@ -345,7 +344,9 @@ static int writeJump(uint8_t instruction) {
   writeByte(instruction);
   writeByte(0xff);
   writeByte(0xff);
-  return currentChunk()->count - 2;
+  return currentChunk()->count - 2; // -2 cuz it's: "instruction" "byte" "byte",
+                                    // so 2 bytes are taken as operands
+  // returns the postion of the instruction within the chunk
 }
 
 static void writeConstant(Value value) {
@@ -368,11 +369,15 @@ static void endScope() {
 }
 static void patchJump(int offset) {
   int jump = currentChunk()->count - offset - 2;
+  //-2 cuz jump operation has 2 operands that have already been consumed by
+  // runtime
   if (jump > UINT16_MAX) {
     error("Too much code to jump over.");
   }
   currentChunk()->code[offset] = (jump >> 8) & 0xff;
+  // should have paid more attention during bitwise operations
   currentChunk()->code[offset + 1] = jump & 0xff;
+  // here too
 }
 static void grouping(bool canAssign) {
   expression();
@@ -444,14 +449,14 @@ static void number(bool canAssign) {
   writeConstant(NUMBER_VAL(value));
 }
 static void or_(bool canAssign) {
-  int elseJump = writeJump(OP_JUMP_IF_FALSE);
-  int endJump = writeJump(OP_JUMP);
-
-  patchJump(elseJump);
+  int if_false = writeJump(OP_JUMP_IF_FALSE);
+  // if false, then parses the right hand side with parsePrecedence(or)
+  int jump_if_true = writeJump(OP_JUMP);
+  // if left hand side is true, then jump over the right and side
+  patchJump(if_false);
   writeByte(OP_POP);
-
   parsePrecedence(PREC_OR);
-  patchJump(endJump);
+  patchJump(jump_if_true);
 }
 
 static void string(bool canAssign) {
