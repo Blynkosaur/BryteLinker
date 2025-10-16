@@ -434,7 +434,7 @@ static void binary(bool canAssign) {
   GREATER LESS AND EQUAL is cuz we can make all the other logic operators with
   them
   >= is the same as. !(<), >= the same as !(<) and != same as !(=)
-  WHAAAAAT BLOWS MY MIND */
+  WHAAAAAT BLOWS MY MIND yeah this is just De Morganz law crazy*/
   default:
     return;
   }
