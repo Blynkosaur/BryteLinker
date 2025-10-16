@@ -63,6 +63,8 @@ static void advance();
 static void error(const char *message);
 static void writeByte(uint8_t byte);
 
+static void patchJump(int offset);
+static int writeJump(uint8_t instruction);
 static void markInitialized();
 static void endScope();
 static void beginScope();
@@ -210,8 +212,8 @@ parseVariable(const char *errorMessage) { // stores the variable name
   if (current->scopeDepth > 0)
     return 0;
   return identifierConstant(
-      &parser.previous); // returns the index of the of the variable name on the
-                         // value array
+      &parser.previous); // returns the index of the of the variable name on
+                         // the value array
 }
 static void markInitialized() {
   current->locals[current->localCount - 1].depth = current->scopeDepth;
@@ -237,10 +239,15 @@ static void ifStatement() {
   consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expect '(' after condition");
-  int thenJump = emitJump(op_jump_if_false);
+  int thenJump = writeJump(OP_JUMP_IF_FALSE);
+  writeByte(OP_POP);
   statement();
-
-  patchJum(thenJump);
+  int elseJump = writeJump(OP_JUMP);
+  patchJump(thenJump);
+  if (match(TOKEN_ELSE))
+    statement();
+  patchJump(elseJump);
+  writeByte(OP_POP);
 }
 static void printStatement() {
   expression();
@@ -314,9 +321,9 @@ static u_int8_t makeConstant(Value value) {
   int constant_index = addConstant(currentChunk(), value);
   // gives back the index on the constant array for the chunk
   if (constant_index > UINT8_MAX) {
-    // since all bytecode are all 8 bits, max is 256 soo..... yeah the max array
-    // size is also 256 bytes all bytecode is 8/bits one byte --> so the maximum
-    // index for the value array is also 256-1
+    // since all bytecode are all 8 bits, max is 256 soo..... yeah the max
+    // array size is also 256 bytes all bytecode is 8/bits one byte --> so the
+    // maximum index for the value array is also 256-1
     error("Too many constants in one chunk.");
     return 0;
   }
@@ -352,7 +359,14 @@ static void endScope() {
     current->localCount--;
   }
 }
-
+static void patchJump(int offset) {
+  int jump = currentChunk()->count - offset - 2;
+  if (jump > UINT16_MAX) {
+    error("Too much code to jump over.");
+  }
+  currentChunk()->code[offset] = (jump >> 8) & 0xff;
+  currentChunk()->code[offset + 1] = jump & 0xff;
+}
 static void grouping(bool canAssign) {
   expression();
   consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
