@@ -205,6 +205,13 @@ static void defineVariable(uint8_t global) {
   writeBytes(OP_DEFINE_GLOBAL, global); // OP_DEFINE_GLOBAL
 }
 
+static void and_(bool canAssign) {
+  int endJump = writeJump(OP_JUMP_IF_FALSE);
+  writeByte(OP_POP);
+  parsePrecedence(PREC_AND);
+  patchJump(endJump);
+}
+
 static uint8_t
 parseVariable(const char *errorMessage) { // stores the variable name
   consume(TOKEN_IDENTIFIER, errorMessage);
@@ -436,6 +443,16 @@ static void number(bool canAssign) {
   double value = strtod(parser.previous.start, NULL);
   writeConstant(NUMBER_VAL(value));
 }
+static void or_(bool canAssign) {
+  int elseJump = writeJump(OP_JUMP_IF_FALSE);
+  int endJump = writeJump(OP_JUMP);
+
+  patchJump(elseJump);
+  writeByte(OP_POP);
+
+  parsePrecedence(PREC_OR);
+  patchJump(endJump);
+}
 
 static void string(bool canAssign) {
   writeConstant(OBJ_VAL(
@@ -492,7 +509,7 @@ ParseRule rules[] = {
     [TOKEN_IDENTIFIER] = {variable, NULL, PREC_NONE},
     [TOKEN_STRING] = {string, NULL, PREC_NONE},
     [TOKEN_NUMBER] = {number, NULL, PREC_NONE},
-    [TOKEN_AND] = {NULL, NULL, PREC_NONE},
+    [TOKEN_AND] = {NULL, and_, PREC_AND},
     [TOKEN_CLASS] = {NULL, NULL, PREC_NONE},
     [TOKEN_ELSE] = {NULL, NULL, PREC_NONE},
     [TOKEN_FALSE] = {literal, NULL, PREC_NONE},
@@ -500,7 +517,7 @@ ParseRule rules[] = {
     [TOKEN_FUN] = {NULL, NULL, PREC_NONE},
     [TOKEN_IF] = {NULL, NULL, PREC_NONE},
     [TOKEN_NULL] = {literal, NULL, PREC_NONE},
-    [TOKEN_OR] = {NULL, NULL, PREC_NONE},
+    [TOKEN_OR] = {NULL, or_, PREC_OR},
     [TOKEN_PRINT] = {NULL, NULL, PREC_NONE},
     [TOKEN_RETURN] = {NULL, NULL, PREC_NONE},
     [TOKEN_SUPER] = {NULL, NULL, PREC_NONE},
