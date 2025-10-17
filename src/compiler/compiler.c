@@ -57,6 +57,7 @@ static bool check(TokenType type);
 static ParseRule *getRule(TokenType type);
 static void parsePrecedence(Precedence precedence);
 static u_int8_t makeConstant(Value value);
+static int writeLoop(int loopStart);
 static bool match(TokenType type);
 static void consume(TokenType type, const char *message);
 static void advance();
@@ -243,19 +244,31 @@ static void expressionStatement() {
 static void ifStatement() {
   consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
   expression();
-  consume(TOKEN_RIGHT_PAREN, "Expect '(' after condition");
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after condition");
   int thenJump = writeJump(OP_JUMP_IF_FALSE);
   writeByte(OP_POP);                 // pop bool of the condition if true
   statement();                       // then clause
-  int elseJump = writeJump(OP_JUMP); // no need to worry bout conditional since
-                                     // included in the if statement
+  int elseJump = writeJump(OP_JUMP); // no need to worry bout conditional
+                                     // since included in the if statement
   patchJump(thenJump);
   if (match(TOKEN_ELSE))
     statement();
   patchJump(elseJump);
   writeByte(OP_POP); // pop bool if false
 }
-static void whileLoop() {}
+static void whileLoop() {
+  int loop_start = currentChunk()->count;
+  consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
+  expression();
+  consume(TOKEN_RIGHT_PAREN, "Expected ')' after expression");
+
+  int loop_exit = writeJump(OP_JUMP_IF_FALSE);
+  writeByte(OP_POP); // pops the condition if true
+  statement();
+  writeLoop(loop_start); // go back to the beginning of the loop
+  patchJump(loop_exit);
+  writeByte(OP_POP);
+}
 static void printStatement() {
   expression();
   consume(TOKEN_SEMICOLON, "Expect ';' after value.");
@@ -342,6 +355,15 @@ static u_int8_t makeConstant(Value value) {
 static void writeBytes(uint8_t byte1, uint8_t byte2) {
   writeByte(byte1);
   writeByte(byte2);
+}
+static int writeLoop(int loopStart) {
+  writeByte(OP_LOOP);
+  int jump = currentChunk()->count - loopStart + 2;
+  if (jump > UINT16_MAX)
+    error("Too big a loop");
+
+  writeByte((jump >> 8) & 0xff);
+  writeByte(jump & 0xff);
 }
 static int writeJump(uint8_t instruction) {
   writeByte(instruction);
