@@ -282,10 +282,24 @@ static void forLoop() {
   }
 
   int loopStart = currentChunk()->count;
-  consume(TOKEN_SEMICOLON, "Expected ';'.");
+  // condition clause
+  int exitJump = -1;
+  if (!match(TOKEN_SEMICOLON)) {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expected ';' after loop condition");
+
+    // exit loop if false
+    exitJump = writeJump(OP_JUMP_IF_FALSE);
+    writeByte(OP_POP);
+  }
   consume(TOKEN_RIGHT_PAREN, "Expected ')' after for clauses.");
   statement();
   writeLoop(loopStart);
+  if (exitJump != -1) {
+    patchJump(exitJump);
+    writeByte(OP_POP);
+  }
+  endScope();
 }
 static void printStatement() {
   expression();
