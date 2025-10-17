@@ -64,6 +64,7 @@ static void advance();
 static void error(const char *message);
 static void writeByte(uint8_t byte);
 static void whileLoop();
+static void forLoop();
 static void patchJump(int offset);
 static int writeJump(uint8_t instruction);
 static void markInitialized();
@@ -269,6 +270,23 @@ static void whileLoop() {
   patchJump(loop_exit);
   writeByte(OP_POP);
 }
+static void forLoop() {
+  beginScope();
+  consume(TOKEN_LEFT_PAREN, "'(' expected after for keyword");
+  if (match(TOKEN_SEMICOLON)) {
+    // no initializer
+  } else if (match(TOKEN_VAR)) {
+    varDeclaration();
+  } else {
+    expressionStatement();
+  }
+
+  int loopStart = currentChunk()->count;
+  consume(TOKEN_SEMICOLON, "Expected ';'.");
+  consume(TOKEN_RIGHT_PAREN, "Expected ')' after for clauses.");
+  statement();
+  writeLoop(loopStart);
+}
 static void printStatement() {
   expression();
   consume(TOKEN_SEMICOLON, "Expect ';' after value.");
@@ -316,6 +334,8 @@ static void statement() {
     ifStatement();
   } else if (match(TOKEN_WHILE)) {
     whileLoop();
+  } else if (match(TOKEN_FOR)) {
+    forLoop();
   } else {
     expressionStatement();
   }
