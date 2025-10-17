@@ -62,7 +62,7 @@ static void consume(TokenType type, const char *message);
 static void advance();
 static void error(const char *message);
 static void writeByte(uint8_t byte);
-
+static void whileLoop();
 static void patchJump(int offset);
 static int writeJump(uint8_t instruction);
 static void markInitialized();
@@ -255,6 +255,7 @@ static void ifStatement() {
   patchJump(elseJump);
   writeByte(OP_POP); // pop bool if false
 }
+static void whileLoop() {}
 static void printStatement() {
   expression();
   consume(TOKEN_SEMICOLON, "Expect ';' after value.");
@@ -300,6 +301,8 @@ static void statement() {
     endScope();
   } else if (match(TOKEN_IF)) {
     ifStatement();
+  } else if (match(TOKEN_WHILE)) {
+    whileLoop();
   } else {
     expressionStatement();
   }
