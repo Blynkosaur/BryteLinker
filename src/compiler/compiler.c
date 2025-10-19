@@ -14,8 +14,6 @@ typedef struct {
 } Parser;
 Chunk *compilingChunk;
 
-static Chunk *currentChunk() { return compilingChunk; }
-
 Parser parser;
 
 typedef enum {
@@ -53,6 +51,7 @@ typedef struct {
 } Compiler;
 
 Compiler *current = NULL;
+static Chunk *currentChunk() { return &current->function->chunk; }
 static void expression();
 static void statement();
 static void declaration();
