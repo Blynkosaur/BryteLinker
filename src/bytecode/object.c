@@ -67,6 +67,10 @@ StringObj *copyString(const char *chars, int length) {
 }
 
 static void printFunction(FunctionObj *function) {
+  if (function->name == NULL) {
+    printf("<script>");
+    return;
+  }
   printf("<fn %s>", function->name->chars);
 }
 void printObject(Value value) {

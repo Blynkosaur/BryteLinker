@@ -436,9 +436,18 @@ static void initCompiler(Compiler *compiler, FunctionType type) {
   local->name.start = "";
   local->name.length = 0;
 }
-static void endCompiler() {
+static FunctionObj *endCompiler() {
   writeReturn();
   FunctionObj *function = current->function;
+#ifdef DEBUG_PRINT_CODE
+#include "../../include/debug.h"
+  if (!parser.hadError) {
+    disassembleChunk(currentChunk(), function->name != NULL
+                                         ? function->name->chars
+                                         : "<script>");
+  }
+#endif
+  return function;
 }
 static void beginScope() { current->scopeDepth++; }
 static void endScope() {
@@ -634,13 +643,6 @@ bool compile(const char *source, Chunk *chunk) {
   }
   endCompiler();
   return true;
-
-#ifdef DEBUG_PRINT_CODE
-#include "../../include/debug.h"
-  if (!parser.hadError) {
-    disassembleChunk(currentChunk(), "code");
-  }
-#endif
 
   return !parser.hadError;
 }
