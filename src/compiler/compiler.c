@@ -42,7 +42,10 @@ typedef struct {
   Token name;
   int depth;
 } Local;
+typedef enum { TYPE_FUNCTION, TYPE_SCRIPT } FunctionType;
 typedef struct {
+  FunctionObj *function;
+  FunctionType type;
   Local locals[UINT8_COUNT];
   int localCount;
   int scopeDepth;
