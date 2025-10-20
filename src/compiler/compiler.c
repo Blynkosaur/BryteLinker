@@ -626,7 +626,7 @@ ParseRule rules[] = {
 };
 static ParseRule *getRule(TokenType type) { return &rules[type]; }
 
-bool compile(const char *source, Chunk *chunk) {
+FunctionObj *compile(const char *source) {
   initScanner(source);
   compilingChunk = chunk;
   parser.hadError = false;
@@ -641,8 +641,7 @@ bool compile(const char *source, Chunk *chunk) {
     }
     declaration();
   }
-  endCompiler();
-  return true;
+  FunctionObj *function = endCompiler();
 
-  return !parser.hadError;
+  return !parser.hadError ? NULL : function;
 }

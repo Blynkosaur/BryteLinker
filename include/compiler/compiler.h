@@ -5,6 +5,6 @@
 #include "../bytecode/object.h"
 #include "../common.h"
 #include "../vm/vm.h"
-bool compile(const char *source);
+FunctionObj *compile(const char *source);
 
 #endif
