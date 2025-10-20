@@ -14,7 +14,7 @@ static void freeObject(Obj *object) {
     free(object);
     break;
   }
-  case OBJ_FUNCION: {
+  case OBJ_FUNCTION: {
     FunctionObj *function = (FunctionObj *)object;
     printf("Freed function: %s\n", function->name->chars);
     freeChunk(&function->chunk);
