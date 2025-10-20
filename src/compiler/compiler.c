@@ -628,8 +628,6 @@ static ParseRule *getRule(TokenType type) { return &rules[type]; }
 
 FunctionObj *compile(const char *source) {
   initScanner(source);
-  compilingChunk = chunk;
-  parser.hadError = false;
   parser.hadError = false;
   advance();
   Compiler compiler;

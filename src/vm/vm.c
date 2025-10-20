@@ -256,7 +256,7 @@ static InterpretResult run() {
 InterpretResult interpret(const char *source) {
   Chunk *chunk = malloc(sizeof(Chunk));
   initChunk(chunk);
-  if (!compile(source, chunk)) {
+  if (!compile(source)) {
     freeChunk(chunk);
     printf("INTERPRET_COMPILE_ERROR\n");
     freeChunk(chunk);
