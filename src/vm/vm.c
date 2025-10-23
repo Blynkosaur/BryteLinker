@@ -12,7 +12,10 @@
 VM vm;
 
 static Value peek(int distance) { return vm.stackTop[-1 - distance]; }
-static void resetStack() { vm.stackTop = vm.stack; }
+static void resetStack() {
+  vm.stackTop = vm.stack;
+  vm.frameCount = 0;
+}
 static void runtimeError(const char *format, ...) {
   va_list args;
   va_start(args, format);

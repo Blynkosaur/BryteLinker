@@ -4,11 +4,20 @@
 #include "../../include/bytecode/value.h"
 #include "../bytecode/chunk.h"
 #include "../datastructures/hashmap.h"
-#include <cstdint>
-#define STACK_MAX 256
+#define FRAMES_MAX 64
+
+#define STACK_MAX (FRAMES_MAX * UINT8_COUNT)
+typedef struct {
+  FunctionObj *function;
+  uint8_t ip;
+  Value *slots;
+} CallFrame;
+
 typedef struct {
   Chunk *chunk;
   uint8_t *ip;
+  CallFrame frames[FRAMES_MAX];
+  int frameCount;
   Value stack[STACK_MAX];
   Value *stackTop;
   Obj *objectsHead;
@@ -16,11 +25,7 @@ typedef struct {
   Table globals; // for global variables
 
 } VM;
-typedef struct {
-  FunctionObj *function;
-  uint8_t ip;
-  Value *slots;
-} CallFrame;
+
 extern VM vm;
 
 void push(Value value);
