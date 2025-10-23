@@ -1,5 +1,6 @@
 #ifndef bryte_vm_h
 #define bryte_vm_h
+#include "../../include/bytecode/object.h"
 #include "../../include/bytecode/value.h"
 #include "../bytecode/chunk.h"
 #include "../datastructures/hashmap.h"
