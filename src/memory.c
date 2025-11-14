@@ -20,6 +20,7 @@ static void freeObject(Obj *object) {
     freeChunk(&function->chunk);
     free(function->name->chars);
     free(function->name);
+    break;
   }
   }
 }
