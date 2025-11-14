@@ -32,6 +32,7 @@ typedef struct {
   StringObj *name;
 
 } FunctionObj;
+FunctionObj *makeFunction();
 
 void printObject(Value value);
 
@@ -50,7 +51,7 @@ static inline bool isObjType(Value value, ObjType type) {
 #define PAYLOAD_STRING(value)                                                  \
   ((StringObj *)(PAYLOAD_OBJ(value))) // --> converts value's obj* to stringobj*
 #define PAYLOAD_CSTRING(value) (((StringObj *)(PAYLOAD_OBJ(value)))->chars)
-#define PAYLOAD_FUNCTION(value) ((FunctionObj *)PAYLOAD_OBJ(value))
+#define PAYLOAD_FUNCTION(value) ((FunctionObj*)PAYLOAD_OBJ(value)
 StringObj *copyString(const char *chars, int length);
 
 StringObj *makeObjWithString(char *chars, int length);
