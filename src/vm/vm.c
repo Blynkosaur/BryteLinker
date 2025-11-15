@@ -8,6 +8,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <system_error>
 
 VM vm;
 
@@ -33,7 +34,7 @@ static bool callValue(Value callee, int argCount) {
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
     case OBJ_FUNCTION:
-      return call (PAYLOAD_FUNCTION(callee), argCount));
+      return call(PAYLOAD_FUNCTION(callee), argCount);
     default:
       break;
     }
@@ -52,10 +53,17 @@ static void runtimeError(const char *format, ...) {
   va_end(args);
   fputs("\n", stderr);
 
-  CallFrame *frame = &vm.frames[vm.frameCount - 1];
-  sizet_t instruction = (frame->ip) - frame->function->chunk.code - 1;
-  int line = frame->function->chunk.lines[instruction];
-  fprintf(stderr, "[line %d] in script \n", line);
+  for (int i = vm.frameCount - 1; i >= 0; i--) {
+    CallFrame *frame = &vm.frames[i];
+    size_t instruction = frame->ip - function->chunk.code - 1;
+    fprintf(stderr, "[line %d] in ", function->chunk.lines[instruction]);
+    if (function->name == NULL) {
+      fprintf(stderr, "script\n");
+
+    } else {
+      fprintf(stderr, "%s()\n" function->name->chars);
+    }
+  }
   resetStack();
 }
 static bool isFalsey(Value value) {
@@ -264,7 +272,16 @@ static InterpretResult run() {
     case OP_RETURN: {
       // printValue(pop());
       // printf("\n");
-      return INTERPRET_OK;
+      Value result = pop();
+      vm.frameCount--;
+      if (vm.frameCount == 0) {
+        pop();
+        return INTERPRET_OK;
+      }
+      vm.stackTop = frame->slots;
+      push(result);
+      frame = &vm.frames[vm.frameCount - 1];
+      break;
     }
     }
 #ifdef DEBUG_TRACE_EXECUTION

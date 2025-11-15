@@ -339,6 +339,18 @@ static void printStatement() {
   consume(TOKEN_SEMICOLON, "Expect ';' after value.");
   writeByte(OP_PRINT);
 }
+static void returnStatement() {
+  if (current->type == TYPE_SCRIPT) {
+    error("Can't return from top-level code. ");
+  }
+  if (match(TOKEN_SEMICOLON)) {
+    writeReturn();
+  } else {
+    expression();
+    consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
+    writeByte(OP_RETURN);
+  }
+}
 static void synchronize() {
   parser.cooked = false;
   while (parser.current.type != TOKEN_EOF) {
@@ -409,6 +421,8 @@ static void statement() {
     endScope();
   } else if (match(TOKEN_IF)) {
     ifStatement();
+  } else if (match(TOKEN_RETURN)) {
+    returnStatement();
   } else if (match(TOKEN_WHILE)) {
     whileLoop();
   } else if (match(TOKEN_FOR)) {
