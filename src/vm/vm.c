@@ -11,7 +11,27 @@
 
 VM vm;
 
+static void runtimeError(const char *format, ...);
 static Value peek(int distance) { return vm.stackTop[-1 - distance]; }
+static bool call(FunctionObj *function, int argCount) {
+  CallFrame *frame = &vm.frames[vm.frameCount++];
+  frame->function = function;
+  frame->ip = function->chunk.code;
+  frame->slots = vm.stackTop - argCount - 1;
+  return true;
+}
+static bool callValue(Value callee, int argCount) {
+  if (IS_OBJ(callee)) {
+    switch (OBJ_TYPE(callee)) {
+    case OBJ_FUNCTION:
+      return call (PAYLOAD_FUNCTION(callee), argCount));
+    default:
+      break;
+    }
+  }
+  runtimeError("Can only call functions and classes.");
+  return false;
+}
 static void resetStack() {
   vm.stackTop = vm.stack;
   vm.frameCount = 0;
@@ -23,9 +43,9 @@ static void runtimeError(const char *format, ...) {
   va_end(args);
   fputs("\n", stderr);
 
-CallFrame * frame - &vm.frames[vm.frameCount - 1];
-sizet_t instruction = frame->ip - frame->function->chunk.code - 1;
-int line = frame->function->chunk.lines[instruction];
+  CallFrame *frame = &vm.frames[vm.frameCount - 1];
+  sizet_t instruction = (frame->ip) - frame->function->chunk.code - 1;
+  int line = frame->function->chunk.lines[instruction];
   fprintf(stderr, "[line %d] in script \n", line);
   resetStack();
 }
@@ -74,7 +94,8 @@ static InterpretResult run() {
     printf("vm.ip: %p\n", vm.ip);
     printf("vm.chunk->code: %p, offset: %d", vm.chunk->code,
            vm.ip - vm.chunk->code);
-    disassembleInstruction(frame->function->chunk, (int)(frame->ip - frame->function->chunk.code));
+    disassembleInstruction(frame->function->chunk,
+                           (int)(frame->ip - frame->function->chunk.code));
 
 #endif
     uint8_t instruction;
@@ -223,6 +244,14 @@ static InterpretResult run() {
       frame->ip -= offset;
       break;
     }
+    case OP_CALL: {
+      int argCount = READ_BYTE();
+      if (!callValue(peek(argCount), argCount)) {
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      frame = &vm.frames[vm.frameCount - 1];
+      break;
+    }
     case OP_RETURN: {
       // printValue(pop());
       // printf("\n");
@@ -263,8 +292,10 @@ static InterpretResult run() {
 }
 InterpretResult interpret(const char *source) {
   FunctionObj *function = compile(source);
-  if (function == NULL) return INTERPRET_COMPILE_ERROR;
+  if (function == NULL)
+    return INTERPRET_COMPILE_ERROR;
   push(OBJ_VAL(function));
+  call(function, 0);
   CallFrame *frame = &vm.frames[vm.frameCount++];
   frame->function = function;
   frame->ip = function->chunk.code;
