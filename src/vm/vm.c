@@ -14,6 +14,15 @@ VM vm;
 static void runtimeError(const char *format, ...);
 static Value peek(int distance) { return vm.stackTop[-1 - distance]; }
 static bool call(FunctionObj *function, int argCount) {
+  if (argCount != function->param_count) {
+    runtimeError("Expected %d arguments but got %d", function->param_count,
+                 argCount);
+    return false;
+  }
+  if (vm.frameCount == FRAMES_MAX) {
+    runtimeError("Stack overflow.");
+    return false;
+  }
   CallFrame *frame = &vm.frames[vm.frameCount++];
   frame->function = function;
   frame->ip = function->chunk.code;

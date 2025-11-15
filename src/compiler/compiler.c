@@ -212,6 +212,21 @@ static void defineVariable(uint8_t global) {
   }
   writeBytes(OP_DEFINE_GLOBAL, global); // OP_DEFINE_GLOBAL
 }
+static uint8_t argumentList() {
+  uint8_t argCount = 0;
+  if (!check(TOKEN_RIGHT_PAREN)) {
+    do {
+      expression();
+      if (argCount == 255) {
+        error("Max no params reached (255)");
+      }
+      argCount++;
+
+    } while (match(TOKEN_COMMA));
+  }
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after params.");
+  return argCount;
+}
 static void and_(bool canAssign) {
   int endJump = writeJump(OP_JUMP_IF_FALSE);
   writeByte(OP_POP);
@@ -352,8 +367,8 @@ static void function(FunctionType type) {
   consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
   if (!check(TOKEN_RIGHT_PAREN)) {
     do {
-      current - function->arity++;
-      if (current->function->arrity > 255) {
+      current->function->param_count++;
+      if (current->function->param_count > 255) {
         errorAtCurrent("Too many params (max 255)");
       }
       uint8_t constant = parseVariable("Need parameter name.");
@@ -576,6 +591,10 @@ static void binary(bool canAssign) {
   default:
     return;
   }
+}
+static void call(bool canAssign) {
+  uint8_t argCount = argumentList();
+  writeBytes(OP_CALL, argCount);
 }
 static void number(bool canAssign) {
   double value = strtod(parser.previous.start, NULL);
