@@ -41,7 +41,8 @@ typedef struct {
   int depth;
 } Local;
 typedef enum { TYPE_FUNCTION, TYPE_SCRIPT } FunctionType;
-typedef struct {
+typedef struct Compiler {
+  struct Compiler *enclosing;
   FunctionObj *function;
   FunctionType type;
   Local locals[UINT8_COUNT];
@@ -74,6 +75,9 @@ static void endScope();
 static void beginScope();
 static bool identifierEquals(Token *a, Token *b);
 static void writeBytes(uint8_t byte1, uint8_t byte2);
+static void initCompiler(Compiler *compiler, FunctionType type);
+static FunctionObj *endCompiler();
+
 static void parsePrecedence(Precedence precedence) {
   advance();
   Parsefunc prefixRule = getRule(parser.previous.type)->prefix;
@@ -225,7 +229,8 @@ parseVariable(const char *errorMessage) { // stores the variable name
                          // the value array
 }
 static void markInitialized() {
-  if (current ->scopeDepth == 0) return;
+  if (current->scopeDepth == 0)
+    return;
   current->locals[current->localCount - 1].depth = current->scopeDepth;
 }
 static void varDeclaration() {
@@ -339,18 +344,30 @@ static void synchronize() {
     default:;
     }
   }
-static void function(FunctionType type){
-  Compiler compiler;
-  initCompiler (&compiler, type);
-  beginScope();
-consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
-consume (TOKEN_RIGHT_PAREN, "Expect ')' after parameters.");
-consume(TOKEN_LEFT_BRACE, "Expect '{' before function body.");
-block();
-FunctionObj *function = endCompiler();
-writeBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
 }
-static void functionDeclaration(){
+static void function(FunctionType type) {
+  Compiler compiler;
+  initCompiler(&compiler, type);
+  beginScope();
+  consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
+  if (!check(TOKEN_RIGHT_PAREN)) {
+    do {
+      current - function->arity++;
+      if (current->function->arrity > 255) {
+        errorAtCurrent("Too many params (max 255)");
+      }
+      uint8_t constant = parseVariable("Need parameter name.");
+      defineVariable(constant);
+
+    } while (match(TOKEN_COMMA));
+  }
+  consume(TOKEN_RIGHT_PAREN, "Expect ')' after parameters.");
+  consume(TOKEN_LEFT_BRACE, "Expect '{' before function body.");
+  block();
+  FunctionObj *function = endCompiler();
+  writeBytes(OP_CONSTANT, makeConstant(OBJ_VAL(function)));
+}
+static void functionDeclaration() {
   uint8_t global = parseVariable("Expected function name");
   markInitialized();
   function(TYPE_FUNCTION);
@@ -359,7 +376,7 @@ static void functionDeclaration(){
 static void declaration() {
   if (match(TOKEN_VAR)) {
     varDeclaration();
-  }else if(match(Tokenfun)) {
+  } else if (match(TOKEN_FUN)) {
     functionDeclaration();
   } else {
 
@@ -443,12 +460,17 @@ static void writeConstant(Value value) {
   writeBytes(OP_CONSTANT, makeConstant(value));
 }
 static void initCompiler(Compiler *compiler, FunctionType type) {
+  compiler->enclosing = current;
   compiler->function = NULL;
   compiler->type = type;
   compiler->localCount = 0;
   compiler->scopeDepth = 0;
   compiler->function = makeFunction();
   current = compiler;
+  if (type != TYPE_SCRIPT) {
+    current->function->name =
+        copyString(parser.previous.start, parser.previous.length);
+  }
 
   Local *local = &current->locals[current->localCount++];
   local->depth = 0;
@@ -466,6 +488,7 @@ static FunctionObj *endCompiler() {
                                          : "<script>");
   }
 #endif
+  current = current->enclosing;
   return function;
 }
 static void beginScope() { current->scopeDepth++; }
@@ -602,7 +625,7 @@ static void variable(bool canAssign) {
   namedVariable(parser.previous, canAssign);
 }
 ParseRule rules[] = {
-    [TOKEN_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
+    [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
