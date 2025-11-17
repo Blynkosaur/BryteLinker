@@ -35,6 +35,10 @@ static bool callValue(Value callee, int argCount) {
     switch (OBJ_TYPE(callee)) {
     case OBJ_FUNCTION:
       return call(PAYLOAD_FUNCTION(callee), argCount);
+    case OBJ_NATIVE: {
+      NativeFn native = PAYLOAD_NATIVE(callee);
+      Value result = native(argCount, vm.stackTop - argCount);
+    }
     default:
       break;
     }
