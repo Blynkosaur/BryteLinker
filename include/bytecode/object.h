@@ -33,6 +33,12 @@ typedef struct {
 
 } FunctionObj;
 FunctionObj *makeFunction();
+typedef Value (*NativeFn)(int argCount, Value *args);
+typedef struct {
+  Obj obj;
+  NativeFn function;
+
+} ObjNative;
 
 void printObject(Value value);
 
