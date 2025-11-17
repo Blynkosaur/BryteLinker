@@ -22,6 +22,10 @@ static void freeObject(Obj *object) {
     free(function->name);
     break;
   }
+  case OBJ_NATIVE: {
+    free(object);
+    break;
+  }
   }
 }
 void freeObjects() {

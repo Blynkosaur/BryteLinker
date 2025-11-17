@@ -25,6 +25,11 @@ FunctionObj *makeFunction() {
   initChunk(&new_function->chunk);
   return new_function;
 }
+ObjNative *newNative(NativeFn function) {
+  ObjNative *native = malloc(sizeof(ObjNative));
+  native->function = function;
+  return native;
+}
 static StringObj *allocateString(char *chars, int length, uint32_t hash) {
   StringObj *string = malloc(sizeof(StringObj));
   string->obj.next = vm.objectsHead;
@@ -83,6 +88,9 @@ void printObject(Value value) {
     printFunction(PAYLOAD_FUNCTION(value));
     break;
   }
+  case OBJ_NATIVE:
+    printf("<native fn");
+    break;
   }
 }
 

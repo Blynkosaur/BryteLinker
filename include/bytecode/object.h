@@ -8,6 +8,7 @@
 typedef enum {
   OBJ_FUNCTION,
   OBJ_STRING,
+  OBJ_NATIVE,
 } ObjType;
 
 struct Obj {
@@ -54,6 +55,7 @@ static inline bool isObjType(Value value, ObjType type) {
 //  pop() would be called twice, ig be careful
 #define IS_STRING(value) isObjType(value, OBJ_STRING)
 #define IS_FUNCTION(value) isObjType(value, OBJ_FUNCTION)
+#define IS_NATIVE (value)(((ObjNative *)PAYLOAD_OBJ(value))->function)
 #define PAYLOAD_STRING(value)                                                  \
   ((StringObj *)(PAYLOAD_OBJ(value))) // --> converts value's obj* to stringobj*
 #define PAYLOAD_CSTRING(value) (((StringObj *)(PAYLOAD_OBJ(value)))->chars)
